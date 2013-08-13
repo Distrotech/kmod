@@ -219,7 +219,7 @@ static inline unsigned int hash_crc32c_hw(const void *key, unsigned int len)
 
 }
 
-static inline unsigned int MurmurHash3_x86_32(const void *key, unsigned int len)
+static inline unsigned int djb(const void *key, unsigned int len)
 {
 	unsigned hash = 5381;
 	const signed char *c;

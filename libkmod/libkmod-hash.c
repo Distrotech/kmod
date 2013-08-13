@@ -283,6 +283,19 @@ static inline unsigned int hash_paul(const char *key, unsigned int len)
 	return hash;
 }
 
+static _always_inline_ unsigned int hashfunc(const char *key, unsigned int len)
+{
+	unsigned long t;
+	unsigned int ret;
+	t = get_cycles(0);
+	ret = MurmurHash3_x86_32(key, len);
+	t = get_cycles(t);
+
+	printf("%u %lu\n", len, t);
+
+	return ret;
+}
+
 /*
  * add or replace key in hash map.
  *
@@ -292,7 +305,7 @@ static inline unsigned int hash_paul(const char *key, unsigned int len)
 int hash_add(struct hash *hash, const char *key, const void *value)
 {
 	unsigned int keylen = strlen(key);
-	unsigned int hashval = hash_superfast(key, keylen);
+	unsigned int hashval = hashfunc(key, keylen);
 	unsigned int pos = hashval & (hash->n_buckets - 1);
 	struct hash_bucket *bucket = hash->buckets + pos;
 	struct hash_entry *entry, *entry_end;
@@ -329,7 +342,7 @@ int hash_add(struct hash *hash, const char *key, const void *value)
 	hash->count++;
 	return 0;
 }
-
+#if 0
 void hash_dump(struct hash *hash)
 {
 	unsigned int i _unused_;
@@ -360,12 +373,16 @@ void hash_dump_keys(struct hash *hash)
 			fprintf(stderr, "%s\n", entry->key);
 	}
 }
+#else
+void hash_dump(struct hash *hash) { }
+void hash_dump_keys(struct hash *hash) {}
+#endif
 
 /* similar to hash_add(), but fails if key already exists */
 int hash_add_unique(struct hash *hash, const char *key, const void *value)
 {
 	unsigned int keylen = strlen(key);
-	unsigned int hashval = hash_superfast(key, keylen);
+	unsigned int hashval = hashfunc(key, keylen);
 	unsigned int pos = hashval & (hash->n_buckets - 1);
 	struct hash_bucket *bucket = hash->buckets + pos;
 	struct hash_entry *entry, *entry_end;
@@ -410,7 +427,7 @@ static int hash_entry_cmp(const void *pa, const void *pb)
 void *hash_find(const struct hash *hash, const char *key)
 {
 	unsigned int keylen = strlen(key);
-	unsigned int hashval = hash_superfast(key, keylen);
+	unsigned int hashval = hashfunc(key, keylen);
 	unsigned int pos = hashval & (hash->n_buckets - 1);
 	const struct hash_bucket *bucket = hash->buckets + pos;
 	const struct hash_entry se = {
@@ -428,7 +445,7 @@ void *hash_find(const struct hash *hash, const char *key)
 int hash_del(struct hash *hash, const char *key)
 {
 	unsigned int keylen = strlen(key);
-	unsigned int hashval = hash_superfast(key, keylen);
+	int hashval = hashfunc(key, keylen);
 	unsigned int pos = hashval & (hash->n_buckets - 1);
 	unsigned int steps_used, steps_total;
 	struct hash_bucket *bucket = hash->buckets + pos;

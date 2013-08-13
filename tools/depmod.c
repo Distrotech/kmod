@@ -1032,6 +1032,10 @@ static void depmod_shutdown(struct depmod *depmod)
 {
 	size_t i;
 
+	hash_dump(depmod->symbols);
+	hash_dump(depmod->modules_by_name);
+	hash_dump(depmod->modules_by_uncrelpath);
+
 	hash_free(depmod->symbols);
 
 	hash_free(depmod->modules_by_uncrelpath);

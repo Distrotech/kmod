@@ -20,3 +20,6 @@ unsigned int hash_get_count(const struct hash *hash);
 void hash_iter_init(const struct hash *hash, struct hash_iter *iter);
 bool hash_iter_next(struct hash_iter *iter, const char **key,
 							const void **value);
+
+void hash_dump(struct hash *hash);
+void hash_dump_keys(struct hash *hash);

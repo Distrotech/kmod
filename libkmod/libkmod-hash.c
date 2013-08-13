@@ -330,6 +330,37 @@ int hash_add(struct hash *hash, const char *key, const void *value)
 	return 0;
 }
 
+void hash_dump(struct hash *hash)
+{
+	unsigned int i _unused_;
+
+	fprintf(stderr, "#####\n");
+	fprintf(stderr, "%p %d %u\n", hash, hash->count, hash->n_buckets);
+	fprintf(stderr, "#####\n");
+	for (i = 0; i < hash->n_buckets; i++) {
+		struct hash_bucket *bucket = hash->buckets + i;
+		fprintf(stderr, "%u %d\n", i, bucket->used);
+	}
+	fprintf(stderr, "#####\n");
+	hash_dump_keys(hash);
+	fprintf(stderr, "#####\n");
+}
+
+void hash_dump_keys(struct hash *hash)
+{
+	unsigned int i;
+
+	for (i = 0; i < hash->n_buckets; i++) {
+		struct hash_bucket *bucket = hash->buckets + i;
+		struct hash_entry *entry, *entry_end;
+
+		entry = bucket->entries;
+		entry_end = entry + bucket->used;
+		for (; entry < entry_end; entry++)
+			fprintf(stderr, "%s\n", entry->key);
+	}
+}
+
 /* similar to hash_add(), but fails if key already exists */
 int hash_add_unique(struct hash *hash, const char *key, const void *value)
 {

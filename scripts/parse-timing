@@ -1,0 +1,62 @@
+#!/usr/bin/python
+
+import sys
+import numpy as np
+
+CUTOFF = 0.8
+
+
+def trimvalues(values, cutoff):
+    sv = sorted(values)
+    n = round(len(values) * cutoff)
+
+    if n <= 2:
+        return sv
+
+    var = []
+    for i in range(len(values) - n):
+        var += [np.std(sv[i:n + i])]
+
+    i = var.index(min(var))
+    return sv[i:n + i]
+
+
+def parse_file(f):
+    val = dict()
+    while True:
+        line = f.readline().split()
+        if len(line) < 2 or not line[0].isdigit():
+            break
+        x = int(line[0])
+        y = float(line[1])
+
+        if x in val:
+            val[x] += [y]
+        else:
+            val[x] = [y]
+
+    x = []
+    y = []
+    s = []
+    n = []
+    for k, v in sorted(val.items()):
+        v = trimvalues(v, CUTOFF)
+        x += [k]
+        y += [np.mean(v)]
+        s += [np.std(v)]
+        n += [len(v)]
+
+    return x, y, s, n
+
+print("# cutoff: %.2f" % CUTOFF)
+print("# len mean stddev nelemen")
+
+if len(sys.argv) > 1:
+    filename = sys.argv[1]
+else:
+    filename = "/dev/stdin"
+
+with open(filename) as f:
+    x, y, s, n = parse_file(f)
+    for i in zip(x, y, s, n):
+        print("%d %.2f %.2f %d" % (i[0], i[1], i[2], i[3]))

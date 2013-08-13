@@ -26,6 +26,24 @@
 #include <string.h>
 #include <errno.h>
 
+static _always_inline_ unsigned long long native_read_tsc(void)
+{
+    unsigned hi, lo;
+    asm volatile ("lfence;\n"
+		  "rdtsc;\n"
+		  : "=a"(lo), "=d"(hi));
+    return (unsigned long long)((lo) | ((uint64_t)(hi) << 32));
+}
+
+static inline unsigned long long get_cycles(unsigned long long last)
+{
+	unsigned long long ret;
+
+	ret = native_read_tsc();
+
+	return ret - last;
+}
+
 struct hash_entry {
 	const char *key;
 	const void *value;
@@ -87,7 +105,134 @@ void hash_free(struct hash *hash)
 	free(hash);
 }
 
-static inline unsigned int hash_superfast(const char *key, unsigned int len)
+static _always_inline_ uint32_t rotl32 ( uint32_t x, int8_t r )
+{
+  return (x << r) | (x >> (32 - r));
+}
+
+#define	ROTL32(x,y)	rotl32(x,y)
+
+static _always_inline_ uint32_t getblock32 ( const uint32_t * p, int i )
+{
+  return p[i];
+}
+
+static inline unsigned int MurmurHash3_x86_32(const void * key, unsigned int len)
+{
+  const uint8_t * data = (const uint8_t*)key;
+  const int nblocks = len / 4;
+
+  uint32_t h1 = 0;
+
+  const uint32_t c1 = 0xcc9e2d51;
+  const uint32_t c2 = 0x1b873593;
+
+  const uint8_t * tail;
+  uint32_t k1;
+
+  //----------
+  // body
+
+  const uint32_t * blocks = (const uint32_t *)(data + nblocks*4);
+
+  for(int i = -nblocks; i; i++)
+  {
+    k1 = getblock32(blocks,i);
+
+    k1 *= c1;
+    k1 = ROTL32(k1,15);
+    k1 *= c2;
+
+    h1 ^= k1;
+    h1 = ROTL32(h1,13);
+    h1 = h1*5+0xe6546b64;
+  }
+
+  //----------
+  // tail
+
+  tail = (const uint8_t*)(data + nblocks*4);
+
+  k1 = 0;
+
+  switch(len & 3)
+  {
+  case 3: k1 ^= tail[2] << 16;
+  case 2: k1 ^= tail[1] << 8;
+  case 1: k1 ^= tail[0];
+          k1 *= c1; k1 = ROTL32(k1,15); k1 *= c2; h1 ^= k1;
+  };
+
+  //----------
+  // finalization
+
+  h1 ^= len;
+
+  h1 ^= h1 >> 16;
+  h1 *= 0x85ebca6b;
+  h1 ^= h1 >> 13;
+  h1 *= 0xc2b2ae35;
+  h1 ^= h1 >> 16;
+
+  return h1;
+}
+
+static inline unsigned int hash_crc32c_hw(const void *key, unsigned int len)
+{
+    const char* p_buf = (const char*) key;
+    unsigned int crc = 0;
+    unsigned int i;
+
+    for (i = 0; i < len / sizeof(uint64_t); i++) {
+	    crc = __builtin_ia32_crc32di(crc, *(uint64_t*) p_buf);
+	    p_buf += sizeof(uint64_t);
+    }
+
+    len &= sizeof(uint64_t) - 1;
+
+    switch (len) {
+    case 7:
+	    crc = __builtin_ia32_crc32qi(crc, *p_buf++);
+    case 6:
+	    crc = __builtin_ia32_crc32hi(crc, *(uint16_t*) p_buf);
+	    p_buf += 2;
+	    // case 5 is below: 4 + 1
+    case 4:
+	    crc = __builtin_ia32_crc32si(crc, *(uint32_t*) p_buf);
+	    break;
+    case 3:
+	    crc = __builtin_ia32_crc32qi(crc, *p_buf++);
+    case 2:
+	    crc = __builtin_ia32_crc32hi(crc, *(uint16_t*) p_buf);
+	    break;
+    case 5:
+	    crc = __builtin_ia32_crc32si(crc, *(uint32_t*) p_buf);
+	    p_buf += 4;
+    case 1:
+	    crc = __builtin_ia32_crc32qi(crc, *p_buf);
+	    break;
+    case 0:
+	    break;
+    }
+
+    return crc;
+
+}
+
+static inline unsigned int MurmurHash3_x86_32(const void *key, unsigned int len)
+{
+	unsigned hash = 5381;
+	const signed char *c;
+
+	/* DJB's hash function */
+
+	for (c = key; *c; c++)
+		hash = (hash << 5) + hash + (unsigned) *c;
+
+	return hash;
+}
+
+static inline unsigned int hash_paul(const char *key, unsigned int len)
 {
 	/* Paul Hsieh (http://www.azillionmonkeys.com/qed/hash.html)
 	 * used by WebCore (http://webkit.org/blog/8/hashtables-part-2/)

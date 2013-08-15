@@ -1,0 +1,41 @@
+#!/usr/bin/python
+
+import os.path
+import sys
+import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.axes_grid.anchored_artists import AnchoredText
+
+
+def parse_table(f):
+    x = []
+    y = []
+    for line in f:
+        if len(line) < 2 or not line[0].isdigit():
+            continue
+
+        val = line.split()[0:2]
+        x += [int(val[0])]
+        y += [float(val[1])]
+
+    return x, y
+
+
+fig = plt.figure()
+ax = fig.add_subplot(111, axisbg='#f6f6f6')
+
+for fn in sys.argv[1:]:
+    with open(fn) as f:
+        x, y = parse_table(f)
+        ax.plot(x, y, label=os.path.splitext(os.path.basename(fn))[0])
+
+ax.set_xlabel('length')
+ax.set_ylabel('clock cycles')
+ax.axis('tight')
+leg = ax.legend(loc=2, fancybox=True, shadow=True)
+leg.get_frame().set_alpha(0.5)
+
+fig.suptitle('Hash function timings', weight='bold', size='large')
+fig.tight_layout()
+plt.subplots_adjust(top=0.9)
+plt.show()

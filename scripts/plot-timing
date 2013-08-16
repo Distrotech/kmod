@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import argparse
 import os.path
 import sys
 import numpy as np
@@ -20,11 +21,15 @@ def parse_table(f):
 
     return x, y
 
+parser = argparse.ArgumentParser()
+parser.add_argument('--name', type=str, default='')
+parser.add_argument('file', nargs='*')
+args = parser.parse_args()
 
 fig = plt.figure()
 ax = fig.add_subplot(111, axisbg='#f6f6f6')
 
-for fn in sys.argv[1:]:
+for fn in args.file:
     with open(fn) as f:
         x, y = parse_table(f)
         ax.plot(x, y, label=os.path.splitext(os.path.basename(fn))[0])
@@ -35,7 +40,8 @@ ax.axis('tight')
 leg = ax.legend(loc=2, fancybox=True, shadow=True)
 leg.get_frame().set_alpha(0.5)
 
-fig.suptitle('Hash function timings', weight='bold', size='large')
+fig.suptitle('Hash function timings: %s' % args.name, weight='bold',
+             size='large')
 fig.tight_layout()
 plt.subplots_adjust(top=0.9)
 plt.show()

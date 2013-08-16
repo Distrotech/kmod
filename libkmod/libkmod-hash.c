@@ -285,15 +285,7 @@ static inline unsigned int hash_paul(const char *key, unsigned int len)
 
 static _always_inline_ unsigned int hashfunc(const char *key, unsigned int len)
 {
-	unsigned long t;
-	unsigned int ret;
-	t = get_cycles(0);
-	ret = MurmurHash3_x86_32(key, len);
-	t = get_cycles(t);
-
-	printf("%u %lu\n", len, t);
-
-	return ret;
+	return hash_crc32c_hw(key, len);
 }
 
 /*
@@ -424,7 +416,7 @@ static int hash_entry_cmp(const void *pa, const void *pb)
 	return strcmp(a->key, b->key);
 }
 
-void *hash_find(const struct hash *hash, const char *key)
+static _always_inline_ void *_hash_find(const struct hash *hash, const char *key)
 {
 	unsigned int keylen = strlen(key);
 	unsigned int hashval = hashfunc(key, keylen);
@@ -440,6 +432,19 @@ void *hash_find(const struct hash *hash, const char *key)
 	if (entry == NULL)
 		return NULL;
 	return (void *)entry->value;
+}
+
+void *hash_find(const struct hash *hash, const char *key)
+{
+	unsigned long t;
+	void *ret;
+
+	t = get_cycles(0);
+	ret = _hash_find(hash, key);
+	t = get_cycles(t);
+
+	printf("%lu %lu\n", strlen(key), t);
+	return ret;
 }
 
 int hash_del(struct hash *hash, const char *key)

@@ -2,11 +2,13 @@
 
 import sys
 import numpy as np
-
-CUTOFF = 0.8
+import argparse
 
 
 def trimvalues(values, cutoff):
+    if not cutoff:
+        return values
+
     sv = sorted(values)
     n = round(len(values) * cutoff)
 
@@ -21,7 +23,7 @@ def trimvalues(values, cutoff):
     return sv[i:n + i]
 
 
-def parse_file(f):
+def parse_file(f, cutoff):
     val = dict()
     while True:
         line = f.readline().split()
@@ -40,7 +42,7 @@ def parse_file(f):
     s = []
     n = []
     for k, v in sorted(val.items()):
-        v = trimvalues(v, CUTOFF)
+        v = trimvalues(v, cutoff)
         x += [k]
         y += [np.mean(v)]
         s += [np.std(v)]
@@ -48,15 +50,23 @@ def parse_file(f):
 
     return x, y, s, n
 
-print("# cutoff: %.2f" % CUTOFF)
+
+parser = argparse.ArgumentParser(description='Parse timings')
+parser.add_argument('--cutoff', '-c', type=float, default=0)
+parser.add_argument('file', nargs='?')
+args = parser.parse_args()
+
+if args.cutoff:
+    print("# cutoff: %.2f" % args.cutoff)
+
 print("# len mean stddev nelemen")
 
-if len(sys.argv) > 1:
-    filename = sys.argv[1]
+if args.file:
+    filename = args.file
 else:
     filename = "/dev/stdin"
 
 with open(filename) as f:
-    x, y, s, n = parse_file(f)
+    x, y, s, n = parse_file(f, args.cutoff)
     for i in zip(x, y, s, n):
         print("%d %.2f %.2f %d" % (i[0], i[1], i[2], i[3]))

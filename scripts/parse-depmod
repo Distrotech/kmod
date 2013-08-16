@@ -2,6 +2,8 @@
 
 import sys
 import os.path
+import argparse
+
 
 def parse_table(f):
     curr = 0
@@ -37,8 +39,14 @@ def add_at(ax, t, loc=2):
     return _at
 
 
+parser = argparse.ArgumentParser()
+parser.add_argument('--save', action='store_true')
+parser.add_argument('files', nargs='*')
+args = parser.parse_args()
+
 figs = []
-for fn in sys.argv[1:]:
+
+for fn in args.files:
     fig = plt.figure()
     figs += [fig]
 
@@ -62,5 +70,8 @@ for fn in sys.argv[1:]:
     fig.tight_layout()
     fig.subplots_adjust(top=0.9)
 
-
-plt.show()
+if args.save:
+    for fig, fn in zip(figs, args.files):
+        fig.savefig(os.path.splitext(fn)[0] + '.png')
+else:
+    plt.show()

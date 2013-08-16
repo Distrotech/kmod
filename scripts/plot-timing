@@ -23,6 +23,7 @@ def parse_table(f):
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--name', type=str, default='')
+parser.add_argument('--save', action='store_true')
 parser.add_argument('file', nargs='*')
 args = parser.parse_args()
 
@@ -44,4 +45,8 @@ fig.suptitle('Hash function timings: %s' % args.name, weight='bold',
              size='large')
 fig.tight_layout()
 plt.subplots_adjust(top=0.9)
-plt.show()
+
+if args.save:
+    fig.savefig(os.path.dirname(args.file[0]) + '/plot.png')
+else:
+    plt.show()

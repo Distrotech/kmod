@@ -1,0 +1,77 @@
+#!/usr/bin/python
+import argparse
+import os.path
+import sys
+import numpy as np
+
+def parse_table(f):
+    x = []
+    y = []
+    for line in f:
+        if len(line) < 2 or not line[0].isdigit():
+            continue
+
+        val = line.split()[0:2]
+        x += [int(val[0])]
+        y += [float(val[1])]
+
+    return x, y
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--groups', nargs=1, default=8)
+parser.add_argument('file', nargs='*')
+args = parser.parse_args()
+
+t = []
+for fn in args.file:
+    with open(fn) as f:
+        x, y = parse_table(f)
+        t += [(x, y)]
+
+
+mx = t[0][0][-1]
+mn = t[0][0][0]
+sz = (mx - mn) / args.groups
+
+cur = mn
+groups=[]
+for g in range(0, args.groups):
+    try:
+        c = groups[-1][1] + 1
+    except:
+        c = mn
+    groups += [tuple([c, int(round(cur + sz, 0))])]
+    cur += sz;
+
+
+idx = []
+for g in groups:
+    x = t[0][0]
+    a = 0
+    b = 0
+    for i in x:
+        if i >= g[0]:
+            a = x.index(i)
+            break
+
+    for i in x[a:]:
+        if i >= g[1]:
+            b = x.index(i)
+            break
+
+    idx += [tuple([a, b])]
+
+#print(groups)
+#print(idx)
+
+
+
+print('{:<10s}{:>8s}{:>8s}'.format('keylen', 'before', 'after'))
+for g in zip(groups, idx):
+    i = g[1]
+    a = np.mean(t[0][1][i[0]:i[1]])
+    b = np.mean(t[1][1][i[0]:i[1]])
+
+    print('{:<10s}'.format('%u-%u' % (g[0][0], g[0][1])), end='')
+    print('{:>8.1f}{:>8.1f}'.format(a, b), end='')
+    print(' ({:.2f}%)'.format(((b - a)/a) * 100))

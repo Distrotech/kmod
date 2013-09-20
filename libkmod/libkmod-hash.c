@@ -47,6 +47,7 @@ static inline unsigned long long get_cycles(unsigned long long last)
 struct hash_entry {
 	const char *key;
 	const void *value;
+	unsigned int hashval;
 };
 
 struct hash_bucket {
@@ -315,21 +316,17 @@ static _always_inline_ int _hash_add(struct hash *hash, const char *key, const v
 	entry = bucket->entries;
 	entry_end = entry + bucket->used;
 	for (; entry < entry_end; entry++) {
-		int c = strcmp(key, entry->key);
-		if (c == 0) {
-			if (hash->free_value)
-				hash->free_value((void *)entry->value);
-			entry->value = value;
-			return 0;
-		} else if (c < 0) {
-			memmove(entry + 1, entry,
-				(entry_end - entry) * sizeof(struct hash_entry));
-			break;
-		}
+		if (hashval != entry->hashval || !streq(key, entry->key))
+			continue;
+		if (hash->free_value)
+			hash->free_value((void *)entry->value);
+		entry->value = value;
+		return 0;
 	}
 
 	entry->key = key;
 	entry->value = value;
+	entry->hashval = hashval;
 	bucket->used++;
 	hash->count++;
 	return 0;
@@ -406,18 +403,13 @@ static _always_inline_ int _hash_add_unique(struct hash *hash, const char *key, 
 	entry = bucket->entries;
 	entry_end = entry + bucket->used;
 	for (; entry < entry_end; entry++) {
-		int c = strcmp(key, entry->key);
-		if (c == 0)
+		if (hashval == entry->hashval && streq(key, entry->key))
 			return -EEXIST;
-		else if (c < 0) {
-			memmove(entry + 1, entry,
-				(entry_end - entry) * sizeof(struct hash_entry));
-			break;
-		}
 	}
 
 	entry->key = key;
 	entry->value = value;
+	entry->hashval = hashval;
 	bucket->used++;
 	hash->count++;
 	return 0;
@@ -436,53 +428,46 @@ int hash_add_unique(struct hash *hash, const char *key, const void *value)
 	return ret;
 }
 
-static int hash_entry_cmp(const void *pa, const void *pb)
-{
-	const struct hash_entry *a = pa;
-	const struct hash_entry *b = pb;
-	return strcmp(a->key, b->key);
-}
-
 void *hash_find(const struct hash *hash, const char *key)
 {
 	unsigned int keylen = strlen(key);
 	unsigned int hashval = hashfunc(key, keylen);
 	unsigned int pos = hashval & (hash->n_buckets - 1);
 	const struct hash_bucket *bucket = hash->buckets + pos;
-	const struct hash_entry se = {
-		.key = key,
-		.value = NULL
-	};
-	const struct hash_entry *entry = bsearch(
-		&se, bucket->entries, bucket->used,
-		sizeof(struct hash_entry), hash_entry_cmp);
-	if (entry == NULL)
-		return NULL;
-	return (void *)entry->value;
+	const struct hash_entry *entry, *entry_end;
+
+	entry = bucket->entries;
+	entry_end = entry + bucket->used;
+	for (; entry < entry_end; entry++) {
+		if (hashval == entry->hashval && streq(key, entry->key))
+			return (void *) entry->value;
+	}
+
+	return NULL;
 }
 
 int hash_del(struct hash *hash, const char *key)
 {
 	unsigned int keylen = strlen(key);
-	int hashval = hashfunc(key, keylen);
+	unsigned int hashval = hashfunc(key, keylen);
 	unsigned int pos = hashval & (hash->n_buckets - 1);
 	unsigned int steps_used, steps_total;
 	struct hash_bucket *bucket = hash->buckets + pos;
 	struct hash_entry *entry, *entry_end;
-	const struct hash_entry se = {
-		.key = key,
-		.value = NULL
-	};
 
-	entry = bsearch(&se, bucket->entries, bucket->used,
-		sizeof(struct hash_entry), hash_entry_cmp);
-	if (entry == NULL)
+	entry = bucket->entries;
+	entry_end = entry + bucket->used;
+	for (; entry < entry_end; entry++) {
+		if (hashval == entry->hashval && streq(key, entry->key))
+			break;
+	}
+
+	if (entry > entry_end)
 		return -ENOENT;
 
 	if (hash->free_value)
 		hash->free_value((void *)entry->value);
 
-	entry_end = bucket->entries + bucket->used;
 	memmove(entry, entry + 1,
 		(entry_end - entry) * sizeof(struct hash_entry));
 

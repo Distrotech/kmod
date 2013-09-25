@@ -295,7 +295,7 @@ static _always_inline_ unsigned int hashfunc(const char *key, unsigned int len)
  * none of key or value are copied, just references are remembered as is,
  * make sure they are live while pair exists in hash!
  */
-static _always_inline_ int _hash_add(struct hash *hash, const char *key, const void *value)
+int hash_add(struct hash *hash, const char *key, const void *value)
 {
 	unsigned int keylen = strlen(key);
 	unsigned int hashval = hashfunc(key, keylen);
@@ -330,19 +330,6 @@ static _always_inline_ int _hash_add(struct hash *hash, const char *key, const v
 	bucket->used++;
 	hash->count++;
 	return 0;
-}
-
-int hash_add(struct hash *hash, const char *key, const void *value)
-{
-	unsigned long t;
-	int ret;
-
-	t = get_cycles(0);
-	ret = _hash_add(hash, key, value);
-	t = get_cycles(t);
-
-	printf("%lu %lu\n", strlen(key), t);
-	return ret;
 }
 
 #if 0
@@ -382,7 +369,7 @@ void hash_dump_keys(struct hash *hash) {}
 #endif
 
 /* similar to hash_add(), but fails if key already exists */
-static _always_inline_ int _hash_add_unique(struct hash *hash, const char *key, const void *value)
+int hash_add_unique(struct hash *hash, const char *key, const void *value)
 {
 	unsigned int keylen = strlen(key);
 	unsigned int hashval = hashfunc(key, keylen);
@@ -415,20 +402,7 @@ static _always_inline_ int _hash_add_unique(struct hash *hash, const char *key, 
 	return 0;
 }
 
-int hash_add_unique(struct hash *hash, const char *key, const void *value)
-{
-	unsigned long t;
-	int ret;
-
-	t = get_cycles(0);
-	ret = _hash_add_unique(hash, key, value);
-	t = get_cycles(t);
-
-	printf("%lu %lu\n", strlen(key), t);
-	return ret;
-}
-
-void *hash_find(const struct hash *hash, const char *key)
+static _always_inline_ void *_hash_find(const struct hash *hash, const char *key)
 {
 	unsigned int keylen = strlen(key);
 	unsigned int hashval = hashfunc(key, keylen);
@@ -444,6 +418,19 @@ void *hash_find(const struct hash *hash, const char *key)
 	}
 
 	return NULL;
+}
+
+void *hash_find(const struct hash *hash, const char *key)
+{
+	unsigned long t;
+	void *ret;
+
+	t = get_cycles(0);
+	ret = _hash_find(hash, key);
+	t = get_cycles(t);
+
+	printf("%lu %lu\n", strlen(key), t);
+	return ret;
 }
 
 int hash_del(struct hash *hash, const char *key)

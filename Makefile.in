@@ -110,10 +110,10 @@ DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/build-aux/missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/attributes.m4 \
-	$(top_srcdir)/m4/gtk-doc.m4 $(top_srcdir)/m4/libtool.m4 \
-	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
-	$(top_srcdir)/m4/ltversion.m4 $(top_srcdir)/m4/lt~obsolete.m4 \
-	$(top_srcdir)/configure.ac
+	$(top_srcdir)/m4/dolt.m4 $(top_srcdir)/m4/gtk-doc.m4 \
+	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/ltoptions.m4 \
+	$(top_srcdir)/m4/ltsugar.m4 $(top_srcdir)/m4/ltversion.m4 \
+	$(top_srcdir)/m4/lt~obsolete.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
@@ -156,7 +156,7 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(pkgpyexecdir)" \
 LTLIBRARIES = $(lib_LTLIBRARIES) $(noinst_LTLIBRARIES) \
 	$(pkgpyexec_LTLIBRARIES)
 am__DEPENDENCIES_1 =
-am__DEPENDENCIES_2 = libkmod/libkmod-util.la $(am__DEPENDENCIES_1) \
+am__DEPENDENCIES_2 = shared/libshared.la $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
 am__dirstamp = $(am__leading_dot)dirstamp
 am__objects_1 = libkmod/libkmod.lo libkmod/libkmod-list.lo \
@@ -174,11 +174,6 @@ libkmod_libkmod_internal_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(AM_CFLAGS) $(CFLAGS) $(libkmod_libkmod_internal_la_LDFLAGS) \
 	$(LDFLAGS) -o $@
-libkmod_libkmod_util_la_LIBADD =
-am_libkmod_libkmod_util_la_OBJECTS = libkmod/libkmod-hash.lo \
-	libkmod/libkmod-array.lo libkmod/libkmod-util.lo
-libkmod_libkmod_util_la_OBJECTS =  \
-	$(am_libkmod_libkmod_util_la_OBJECTS)
 am_libkmod_libkmod_la_OBJECTS = libkmod/libkmod.lo \
 	libkmod/libkmod-list.lo libkmod/libkmod-config.lo \
 	libkmod/libkmod-index.lo libkmod/libkmod-module.lo \
@@ -241,6 +236,10 @@ libkmod_python_kmod_module_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(libkmod_python_kmod_module_la_LDFLAGS) $(LDFLAGS) -o $@
 @BUILD_PYTHON_TRUE@am_libkmod_python_kmod_module_la_rpath = -rpath \
 @BUILD_PYTHON_TRUE@	$(pkgpyexecdir)
+shared_libshared_la_LIBADD =
+am_shared_libshared_la_OBJECTS = shared/array.lo shared/hash.lo \
+	shared/strbuf.lo shared/util.lo
+shared_libshared_la_OBJECTS = $(am_shared_libshared_la_OBJECTS)
 testsuite_delete_module_la_LIBADD =
 testsuite_delete_module_la_SOURCES = testsuite/delete_module.c
 testsuite_delete_module_la_OBJECTS = testsuite/delete_module.lo
@@ -262,7 +261,7 @@ testsuite_libtestsuite_la_OBJECTS =  \
 	$(am_testsuite_libtestsuite_la_OBJECTS)
 testsuite_path_la_LIBADD =
 testsuite_path_la_SOURCES = testsuite/path.c
-testsuite_path_la_OBJECTS = testsuite/path.lo
+testsuite_path_la_OBJECTS = testsuite/testsuite_path_la-path.lo
 testsuite_path_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(AM_CFLAGS) $(CFLAGS) $(testsuite_path_la_LDFLAGS) $(LDFLAGS) \
@@ -274,7 +273,9 @@ testsuite_uname_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(AM_CFLAGS) $(CFLAGS) $(testsuite_uname_la_LDFLAGS) \
 	$(LDFLAGS) -o $@
-am__EXEEXT_1 = testsuite/test-init$(EXEEXT) \
+am__EXEEXT_1 = testsuite/test-hash$(EXEEXT) \
+	testsuite/test-array$(EXEEXT) testsuite/test-strbuf$(EXEEXT) \
+	testsuite/test-init$(EXEEXT) testsuite/test-initstate$(EXEEXT) \
 	testsuite/test-testsuite$(EXEEXT) \
 	testsuite/test-loaded$(EXEEXT) testsuite/test-modinfo$(EXEEXT) \
 	testsuite/test-util$(EXEEXT) \
@@ -282,8 +283,13 @@ am__EXEEXT_1 = testsuite/test-init$(EXEEXT) \
 	testsuite/test-modprobe$(EXEEXT) \
 	testsuite/test-blacklist$(EXEEXT) \
 	testsuite/test-dependencies$(EXEEXT) \
-	testsuite/test-depmod$(EXEEXT)
+	testsuite/test-depmod$(EXEEXT) testsuite/test-list$(EXEEXT) \
+	testsuite/test-tools$(EXEEXT)
 PROGRAMS = $(bin_PROGRAMS)
+testsuite_test_array_SOURCES = testsuite/test-array.c
+testsuite_test_array_OBJECTS =  \
+	testsuite/testsuite_test_array-test-array.$(OBJEXT)
+testsuite_test_array_DEPENDENCIES = $(TESTSUITE_LDADD)
 testsuite_test_blacklist_SOURCES = testsuite/test-blacklist.c
 testsuite_test_blacklist_OBJECTS =  \
 	testsuite/testsuite_test_blacklist-test-blacklist.$(OBJEXT)
@@ -295,10 +301,22 @@ testsuite_test_depmod_SOURCES = testsuite/test-depmod.c
 testsuite_test_depmod_OBJECTS =  \
 	testsuite/testsuite_test_depmod-test-depmod.$(OBJEXT)
 testsuite_test_depmod_DEPENDENCIES = $(TESTSUITE_LDADD)
+testsuite_test_hash_SOURCES = testsuite/test-hash.c
+testsuite_test_hash_OBJECTS =  \
+	testsuite/testsuite_test_hash-test-hash.$(OBJEXT)
+testsuite_test_hash_DEPENDENCIES = $(TESTSUITE_LDADD)
 testsuite_test_init_SOURCES = testsuite/test-init.c
 testsuite_test_init_OBJECTS =  \
 	testsuite/testsuite_test_init-test-init.$(OBJEXT)
 testsuite_test_init_DEPENDENCIES = $(TESTSUITE_LDADD)
+testsuite_test_initstate_SOURCES = testsuite/test-initstate.c
+testsuite_test_initstate_OBJECTS =  \
+	testsuite/testsuite_test_initstate-test-initstate.$(OBJEXT)
+testsuite_test_initstate_DEPENDENCIES = $(TESTSUITE_LDADD)
+testsuite_test_list_SOURCES = testsuite/test-list.c
+testsuite_test_list_OBJECTS =  \
+	testsuite/testsuite_test_list-test-list.$(OBJEXT)
+testsuite_test_list_DEPENDENCIES = $(TESTSUITE_LDADD)
 testsuite_test_loaded_SOURCES = testsuite/test-loaded.c
 testsuite_test_loaded_OBJECTS =  \
 	testsuite/testsuite_test_loaded-test-loaded.$(OBJEXT)
@@ -315,27 +333,38 @@ testsuite_test_new_module_SOURCES = testsuite/test-new-module.c
 testsuite_test_new_module_OBJECTS =  \
 	testsuite/testsuite_test_new_module-test-new-module.$(OBJEXT)
 testsuite_test_new_module_DEPENDENCIES = $(TESTSUITE_LDADD)
+testsuite_test_strbuf_SOURCES = testsuite/test-strbuf.c
+testsuite_test_strbuf_OBJECTS =  \
+	testsuite/testsuite_test_strbuf-test-strbuf.$(OBJEXT)
+testsuite_test_strbuf_DEPENDENCIES = $(TESTSUITE_LDADD)
 testsuite_test_testsuite_SOURCES = testsuite/test-testsuite.c
 testsuite_test_testsuite_OBJECTS =  \
 	testsuite/testsuite_test_testsuite-test-testsuite.$(OBJEXT)
 testsuite_test_testsuite_DEPENDENCIES = testsuite/libtestsuite.la \
-	libkmod/libkmod-util.la
+	shared/libshared.la
+testsuite_test_tools_SOURCES = testsuite/test-tools.c
+testsuite_test_tools_OBJECTS =  \
+	testsuite/testsuite_test_tools-test-tools.$(OBJEXT)
+testsuite_test_tools_DEPENDENCIES = $(TESTSUITE_LDADD)
 testsuite_test_util_SOURCES = testsuite/test-util.c
 testsuite_test_util_OBJECTS =  \
 	testsuite/testsuite_test_util-test-util.$(OBJEXT)
 testsuite_test_util_DEPENDENCIES = $(TESTSUITE_LDADD)
 am__tools_kmod_SOURCES_DIST = tools/kmod.c tools/kmod.h tools/lsmod.c \
 	tools/rmmod.c tools/insmod.c tools/modinfo.c tools/modprobe.c \
-	tools/depmod.c tools/log.h tools/log.c tools/static-nodes.c
+	tools/depmod.c tools/log.h tools/log.c tools/insert.c \
+	tools/remove.c tools/static-nodes.c
 @BUILD_TOOLS_TRUE@am_tools_kmod_OBJECTS = tools/kmod.$(OBJEXT) \
 @BUILD_TOOLS_TRUE@	tools/lsmod.$(OBJEXT) tools/rmmod.$(OBJEXT) \
 @BUILD_TOOLS_TRUE@	tools/insmod.$(OBJEXT) \
 @BUILD_TOOLS_TRUE@	tools/modinfo.$(OBJEXT) \
 @BUILD_TOOLS_TRUE@	tools/modprobe.$(OBJEXT) \
 @BUILD_TOOLS_TRUE@	tools/depmod.$(OBJEXT) tools/log.$(OBJEXT) \
+@BUILD_TOOLS_TRUE@	tools/insert.$(OBJEXT) \
+@BUILD_TOOLS_TRUE@	tools/remove.$(OBJEXT) \
 @BUILD_TOOLS_TRUE@	tools/static-nodes.$(OBJEXT)
 tools_kmod_OBJECTS = $(am_tools_kmod_OBJECTS)
-@BUILD_TOOLS_TRUE@tools_kmod_DEPENDENCIES = libkmod/libkmod-util.la \
+@BUILD_TOOLS_TRUE@tools_kmod_DEPENDENCIES = shared/libshared.la \
 @BUILD_TOOLS_TRUE@	libkmod/libkmod-internal.la
 SCRIPTS = $(noinst_SCRIPTS)
 AM_V_P = $(am__v_P_@AM_V@)
@@ -356,10 +385,6 @@ am__depfiles_maybe = depfiles
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) \
-	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
-	$(AM_CFLAGS) $(CFLAGS)
 AM_V_CC = $(am__v_CC_@AM_V@)
 am__v_CC_ = $(am__v_CC_@AM_DEFAULT_V@)
 am__v_CC_0 = @echo "  CC      " $@;
@@ -373,34 +398,40 @@ am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
 SOURCES = $(libkmod_libkmod_internal_la_SOURCES) \
-	$(libkmod_libkmod_util_la_SOURCES) \
 	$(libkmod_libkmod_la_SOURCES) \
 	$(libkmod_python_kmod__util_la_SOURCES) \
 	$(libkmod_python_kmod_kmod_la_SOURCES) \
 	$(libkmod_python_kmod_list_la_SOURCES) \
 	$(libkmod_python_kmod_module_la_SOURCES) \
-	testsuite/delete_module.c $(testsuite_init_module_la_SOURCES) \
+	$(shared_libshared_la_SOURCES) testsuite/delete_module.c \
+	$(testsuite_init_module_la_SOURCES) \
 	$(testsuite_libtestsuite_la_SOURCES) testsuite/path.c \
-	testsuite/uname.c testsuite/test-blacklist.c \
-	testsuite/test-dependencies.c testsuite/test-depmod.c \
-	testsuite/test-init.c testsuite/test-loaded.c \
+	testsuite/uname.c testsuite/test-array.c \
+	testsuite/test-blacklist.c testsuite/test-dependencies.c \
+	testsuite/test-depmod.c testsuite/test-hash.c \
+	testsuite/test-init.c testsuite/test-initstate.c \
+	testsuite/test-list.c testsuite/test-loaded.c \
 	testsuite/test-modinfo.c testsuite/test-modprobe.c \
-	testsuite/test-new-module.c testsuite/test-testsuite.c \
+	testsuite/test-new-module.c testsuite/test-strbuf.c \
+	testsuite/test-testsuite.c testsuite/test-tools.c \
 	testsuite/test-util.c $(tools_kmod_SOURCES)
 DIST_SOURCES = $(libkmod_libkmod_internal_la_SOURCES) \
-	$(libkmod_libkmod_util_la_SOURCES) \
 	$(libkmod_libkmod_la_SOURCES) \
 	$(am__libkmod_python_kmod__util_la_SOURCES_DIST) \
 	$(am__libkmod_python_kmod_kmod_la_SOURCES_DIST) \
 	$(am__libkmod_python_kmod_list_la_SOURCES_DIST) \
 	$(am__libkmod_python_kmod_module_la_SOURCES_DIST) \
-	testsuite/delete_module.c $(testsuite_init_module_la_SOURCES) \
+	$(shared_libshared_la_SOURCES) testsuite/delete_module.c \
+	$(testsuite_init_module_la_SOURCES) \
 	$(testsuite_libtestsuite_la_SOURCES) testsuite/path.c \
-	testsuite/uname.c testsuite/test-blacklist.c \
-	testsuite/test-dependencies.c testsuite/test-depmod.c \
-	testsuite/test-init.c testsuite/test-loaded.c \
+	testsuite/uname.c testsuite/test-array.c \
+	testsuite/test-blacklist.c testsuite/test-dependencies.c \
+	testsuite/test-depmod.c testsuite/test-hash.c \
+	testsuite/test-init.c testsuite/test-initstate.c \
+	testsuite/test-list.c testsuite/test-loaded.c \
 	testsuite/test-modinfo.c testsuite/test-modprobe.c \
-	testsuite/test-new-module.c testsuite/test-testsuite.c \
+	testsuite/test-new-module.c testsuite/test-strbuf.c \
+	testsuite/test-testsuite.c testsuite/test-tools.c \
 	testsuite/test-util.c $(am__tools_kmod_SOURCES_DIST)
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
@@ -689,6 +720,8 @@ CYTHON = @CYTHON@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
 DLLTOOL = @DLLTOOL@
+DOLT_BASH = @DOLT_BASH@
+DOLT_CLEANFILES = @DOLT_CLEANFILES@
 DSYMUTIL = @DSYMUTIL@
 DUMPBIN = @DUMPBIN@
 ECHO_C = @ECHO_C@
@@ -697,7 +730,6 @@ ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
-GCLDFLAGS = @GCLDFLAGS@
 GREP = @GREP@
 GTKDOC_CHECK = @GTKDOC_CHECK@
 GTKDOC_DEPS_CFLAGS = @GTKDOC_DEPS_CFLAGS@
@@ -717,6 +749,8 @@ LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
 LIPO = @LIPO@
 LN_S = @LN_S@
+LTCOMPILE = @LTCOMPILE@
+LTCXXCOMPILE = @LTCXXCOMPILE@
 LTLIBOBJS = @LTLIBOBJS@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
@@ -728,6 +762,8 @@ OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
 OTOOL = @OTOOL@
 OTOOL64 = @OTOOL64@
+OUR_CFLAGS = @OUR_CFLAGS@
+OUR_LDFLAGS = @OUR_LDFLAGS@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
@@ -752,7 +788,6 @@ SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
 VERSION = @VERSION@
-WARNINGFLAGS = @WARNINGFLAGS@
 XSLTPROC = @XSLTPROC@
 abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
@@ -779,6 +814,7 @@ datarootdir = @datarootdir@
 docdir = @docdir@
 dvidir = @dvidir@
 exec_prefix = @exec_prefix@
+have_coverage = @have_coverage@
 host = @host@
 host_alias = @host_alias@
 host_cpu = @host_cpu@
@@ -818,22 +854,48 @@ zlib_CFLAGS = @zlib_CFLAGS@
 zlib_LIBS = @zlib_LIBS@
 SUBDIRS = . libkmod/docs $(am__append_1)
 DISTCLEAN_LOCAL_HOOKS = testsuite-distclean
+
+# ------------------------------------------------------------------------------
+# TESTSUITE
+# ------------------------------------------------------------------------------
 EXTRA_DIST = libkmod/libkmod.sym libkmod/README libkmod/COPYING \
-	testsuite/COPYING COPYING libkmod/libkmod.pc.in \
-	testsuite/rootfs-pristine
+	testsuite/COPYING tools/COPYING COPYING libkmod/libkmod.pc.in \
+	testsuite/populate-modules.sh \
+	testsuite/module-playground/dummy.sha1 \
+	testsuite/module-playground/dummy.sha256 \
+	testsuite/module-playground/Makefile \
+	testsuite/module-playground/Makefile.arch \
+	testsuite/module-playground/mod-fake-cciss.c \
+	testsuite/module-playground/mod-fake-hpsa.c \
+	testsuite/module-playground/mod-fake-scsi-mod.c \
+	testsuite/module-playground/mod-foo-a.c \
+	testsuite/module-playground/mod-foo-b.c \
+	testsuite/module-playground/mod-foo.c \
+	testsuite/module-playground/mod-foo-c.c \
+	testsuite/module-playground/mod-loop-a.c \
+	testsuite/module-playground/mod-loop-b.c \
+	testsuite/module-playground/mod-loop-c.c \
+	testsuite/module-playground/mod-loop-d.c \
+	testsuite/module-playground/mod-loop-e.c \
+	testsuite/module-playground/mod-loop.h \
+	testsuite/module-playground/mod-simple.c \
+	testsuite/module-playground/mod-simple-i386.ko \
+	testsuite/module-playground/mod-simple-sparc64.ko \
+	testsuite/module-playground/mod-simple-x86_64.ko \
+	testsuite/module-playground/README testsuite/rootfs-pristine
 CLEANFILES = $(BUILT_FILES) libkmod/libkmod.pc
+DISTCLEANFILES = $(DOLT_CLEANFILES)
 BUILT_FILES = $(am__append_2)
 ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
 AM_MAKEFLAGS = --no-print-directory
 AM_CPPFLAGS = \
 	-include $(top_builddir)/config.h \
-	-I$(top_srcdir)/libkmod \
+	-I$(top_srcdir) \
 	-DSYSCONFDIR=\""$(sysconfdir)"\" \
-	-DLIBEXECDIR=\""$(libexecdir)"\" \
 	${zlib_CFLAGS}
 
-AM_CFLAGS = $(WARNINGFLAGS)
-AM_LDFLAGS = $(GCLDFLAGS)
+AM_CFLAGS = $(OUR_CFLAGS)
+AM_LDFLAGS = $(OUR_LDFLAGS)
 SED_PROCESS = \
 	$(AM_V_GEN)$(MKDIR_P) $(dir $@) && $(SED) \
 	-e 's,@VERSION\@,$(VERSION),g' \
@@ -848,24 +910,26 @@ SED_PROCESS = \
 	< $< > $@ || rm $@
 
 LIBKMOD_CURRENT = 4
-LIBKMOD_REVISION = 7
+LIBKMOD_REVISION = 10
 LIBKMOD_AGE = 2
-noinst_LTLIBRARIES = libkmod/libkmod-util.la \
-	libkmod/libkmod-internal.la
-libkmod_libkmod_util_la_SOURCES = libkmod/libkmod-hash.c \
-				  libkmod/libkmod-hash.h \
-				  libkmod/libkmod-array.c \
-				  libkmod/libkmod-array.h \
-				  libkmod/libkmod-util.c \
-				  libkmod/libkmod-util.h
+noinst_LTLIBRARIES = shared/libshared.la libkmod/libkmod-internal.la
+shared_libshared_la_SOURCES = \
+	shared/macro.h \
+	shared/missing.h \
+	shared/array.c \
+	shared/array.h \
+	shared/hash.c \
+	shared/hash.h \
+	shared/strbuf.c \
+	shared/strbuf.h \
+	shared/util.c \
+	shared/util.h
 
 include_HEADERS = libkmod/libkmod.h
 lib_LTLIBRARIES = libkmod/libkmod.la
 libkmod_libkmod_la_SOURCES = \
 	libkmod/libkmod.h \
 	libkmod/libkmod-internal.h \
-	libkmod/macro.h \
-	libkmod/missing.h \
 	libkmod/libkmod.c \
 	libkmod/libkmod-list.c \
 	libkmod/libkmod-config.c \
@@ -880,11 +944,13 @@ libkmod_libkmod_la_LDFLAGS = $(AM_LDFLAGS) \
 	-version-info $(LIBKMOD_CURRENT):$(LIBKMOD_REVISION):$(LIBKMOD_AGE) \
 	-Wl,--version-script=$(top_srcdir)/libkmod/libkmod.sym
 
-libkmod_libkmod_la_DEPENDENCIES = libkmod/libkmod-util.la \
-				  ${top_srcdir}/libkmod/libkmod.sym
+libkmod_libkmod_la_DEPENDENCIES = \
+	shared/libshared.la \
+	${top_srcdir}/libkmod/libkmod.sym
 
-libkmod_libkmod_la_LIBADD = libkmod/libkmod-util.la \
-			    ${liblzma_LIBS} ${zlib_LIBS}
+libkmod_libkmod_la_LIBADD = \
+	shared/libshared.la \
+	${liblzma_LIBS} ${zlib_LIBS}
 
 libkmod_libkmod_internal_la_SOURCES = $(libkmod_libkmod_la_SOURCES)
 libkmod_libkmod_internal_la_LDFLAGS = $(AM_LDFLAGS) \
@@ -897,17 +963,22 @@ pkgconfig_DATA = libkmod/libkmod.pc
 dist_bashcompletion_DATA = \
 	shell-completion/bash/kmod
 
-@BUILD_TOOLS_TRUE@noinst_SCRIPTS = tools/insmod tools/rmmod tools/lsmod \
-@BUILD_TOOLS_TRUE@		 tools/modprobe tools/modinfo tools/depmod
+@BUILD_TOOLS_TRUE@noinst_SCRIPTS = \
+@BUILD_TOOLS_TRUE@	tools/insmod tools/rmmod tools/lsmod \
+@BUILD_TOOLS_TRUE@	tools/modprobe tools/modinfo tools/depmod
 
-@BUILD_TOOLS_TRUE@tools_kmod_SOURCES = tools/kmod.c tools/kmod.h tools/lsmod.c \
-@BUILD_TOOLS_TRUE@		     tools/rmmod.c tools/insmod.c \
-@BUILD_TOOLS_TRUE@		     tools/modinfo.c tools/modprobe.c \
-@BUILD_TOOLS_TRUE@		     tools/depmod.c tools/log.h tools/log.c \
-@BUILD_TOOLS_TRUE@		     tools/static-nodes.c
+@BUILD_TOOLS_TRUE@tools_kmod_SOURCES = \
+@BUILD_TOOLS_TRUE@	tools/kmod.c tools/kmod.h tools/lsmod.c \
+@BUILD_TOOLS_TRUE@	tools/rmmod.c tools/insmod.c \
+@BUILD_TOOLS_TRUE@	tools/modinfo.c tools/modprobe.c \
+@BUILD_TOOLS_TRUE@	tools/depmod.c tools/log.h tools/log.c \
+@BUILD_TOOLS_TRUE@	tools/insert.c \
+@BUILD_TOOLS_TRUE@	tools/remove.c \
+@BUILD_TOOLS_TRUE@	tools/static-nodes.c
 
-@BUILD_TOOLS_TRUE@tools_kmod_LDADD = libkmod/libkmod-util.la \
-@BUILD_TOOLS_TRUE@		   libkmod/libkmod-internal.la
+@BUILD_TOOLS_TRUE@tools_kmod_LDADD = \
+@BUILD_TOOLS_TRUE@	shared/libshared.la \
+@BUILD_TOOLS_TRUE@	libkmod/libkmod-internal.la
 
 
 # ------------------------------------------------------------------------------
@@ -923,15 +994,17 @@ am__v_CYTHON_0 = @echo "  CYTHON " $@;
 
 # Remove some warnings for generated code
 PYTHON_NOWARN = -Wno-redundant-decls -Wno-shadow -Wno-strict-aliasing
-CPYTHON_MODULE_CFLAGS = $(AM_CFLAGS) -DCPYTHON_COMPILING_IN_PYPY=0 \
-			$(PYTHON_NOWARN) $(PYTHON_CFLAGS) \
-			-fvisibility=default
+CPYTHON_MODULE_CFLAGS = \
+	$(AM_CFLAGS) -DCPYTHON_COMPILING_IN_PYPY=0 \
+	$(PYTHON_NOWARN) $(PYTHON_CFLAGS) \
+	-fvisibility=default
 
 CPYTHON_MODULE_LDFLAGS = $(AM_LDFLAGS) -module -avoid-version -shared
-@BUILD_PYTHON_TRUE@pkgpyexec_LTLIBRARIES = libkmod/python/kmod/kmod.la \
-@BUILD_PYTHON_TRUE@			libkmod/python/kmod/list.la \
-@BUILD_PYTHON_TRUE@			libkmod/python/kmod/module.la \
-@BUILD_PYTHON_TRUE@			libkmod/python/kmod/_util.la
+@BUILD_PYTHON_TRUE@pkgpyexec_LTLIBRARIES = \
+@BUILD_PYTHON_TRUE@	libkmod/python/kmod/kmod.la \
+@BUILD_PYTHON_TRUE@	libkmod/python/kmod/list.la \
+@BUILD_PYTHON_TRUE@	libkmod/python/kmod/module.la \
+@BUILD_PYTHON_TRUE@	libkmod/python/kmod/_util.la
 
 @BUILD_PYTHON_TRUE@libkmod_python_kmod_kmod_la_SOURCES = libkmod/python/kmod/kmod.c
 @BUILD_PYTHON_TRUE@libkmod_python_kmod_kmod_la_CFLAGS = $(CPYTHON_MODULE_CFLAGS)
@@ -949,31 +1022,36 @@ CPYTHON_MODULE_LDFLAGS = $(AM_LDFLAGS) -module -avoid-version -shared
 @BUILD_PYTHON_TRUE@libkmod_python_kmod__util_la_CFLAGS = $(CPYTHON_MODULE_CFLAGS)
 @BUILD_PYTHON_TRUE@libkmod_python_kmod__util_la_LDFLAGS = $(CPYTHON_MODULE_LDFLAGS)
 @BUILD_PYTHON_TRUE@libkmod_python_kmod__util_la_LIBADD = $(PYTHON_LIBS) libkmod/libkmod.la
-@BUILD_PYTHON_TRUE@dist_pkgpyexec_PYTHON = libkmod/python/kmod/error.py \
-@BUILD_PYTHON_TRUE@			libkmod/python/kmod/__init__.py \
-@BUILD_PYTHON_TRUE@			libkmod/python/kmod/version.py
+@BUILD_PYTHON_TRUE@dist_pkgpyexec_PYTHON = \
+@BUILD_PYTHON_TRUE@	libkmod/python/kmod/error.py \
+@BUILD_PYTHON_TRUE@	libkmod/python/kmod/__init__.py \
+@BUILD_PYTHON_TRUE@	libkmod/python/kmod/version.py
 
-
-# ------------------------------------------------------------------------------
-# TESTSUITE
-# ------------------------------------------------------------------------------
+MODULE_PLAYGROUND = testsuite/module-playground
 ROOTFS = testsuite/rootfs
 ROOTFS_PRISTINE = $(top_srcdir)/testsuite/rootfs-pristine
 CREATE_ROOTFS = $(AM_V_GEN) ( $(RM) -rf $(ROOTFS) && mkdir -p $(dir $(ROOTFS)) && \
 				cp -r $(ROOTFS_PRISTINE) $(ROOTFS) && \
-				touch testsuite/stamp-rootfs && \
-				find $(ROOTFS) -type d -exec chmod +w {} \; )
+				find $(ROOTFS) -type d -exec chmod +w {} \; && \
+				find $(ROOTFS) -type f -name .gitignore -exec rm -f {} \; && \
+				$(top_srcdir)/testsuite/populate-modules.sh \
+					$(MODULE_PLAYGROUND) $(ROOTFS) ) && \
+				touch testsuite/stamp-rootfs
 
-TESTSUITE_OVERRIDE_LIBS = testsuite/uname.la testsuite/path.la \
-			  testsuite/init_module.la \
-			  testsuite/delete_module.la
+TESTSUITE_OVERRIDE_LIBS = \
+	testsuite/uname.la testsuite/path.la \
+	testsuite/init_module.la \
+	testsuite/delete_module.la
 
-TESTSUITE_OVERRIDE_LIBS_LDFLAGS = avoid-version -module -shared -export-dynamic \
-				  -rpath /nowhere -ldl
+TESTSUITE_OVERRIDE_LIBS_LDFLAGS = \
+	avoid-version -module -shared -export-dynamic -rpath /nowhere -ldl
 
 check_LTLIBRARIES = $(TESTSUITE_OVERRIDE_LIBS) \
 	testsuite/libtestsuite.la
 testsuite_uname_la_LDFLAGS = $(TESTSUITE_OVERRIDE_LIBS_LDFLAGS)
+testsuite_path_la_CPPFLAGS = $(AM_CPPFLAGS) \
+	-DABS_TOP_BUILDDIR=\"$(abs_top_builddir)\"
+
 testsuite_path_la_LDFLAGS = $(TESTSUITE_OVERRIDE_LIBS_LDFLAGS)
 testsuite_delete_module_la_LDFLAGS = $(TESTSUITE_OVERRIDE_LIBS_LDFLAGS)
 testsuite_init_module_la_LDFLAGS = $(TESTSUITE_OVERRIDE_LIBS_LDFLAGS)
@@ -982,29 +1060,48 @@ testsuite_init_module_la_SOURCES = testsuite/init_module.c \
 
 testsuite_init_module_la_LIBADD = libkmod/libkmod-internal.la
 TESTSUITE_CPPFLAGS = $(AM_CPPFLAGS) \
-		     -DTESTSUITE_ROOTFS=\"$(abs_top_builddir)/$(ROOTFS)/\" \
-		     -DABS_TOP_BUILDDIR=\"$(abs_top_builddir)\"
+	-DTESTSUITE_ROOTFS=\"$(abs_top_builddir)/$(ROOTFS)/\" \
+	-DABS_TOP_BUILDDIR=\"$(abs_top_builddir)\"
 
-TESTSUITE_LDADD = testsuite/libtestsuite.la libkmod/libkmod-internal.la \
-		  libkmod/libkmod-util.la
+TESTSUITE_LDADD = \
+	testsuite/libtestsuite.la libkmod/libkmod-internal.la \
+	shared/libshared.la
 
-testsuite_libtestsuite_la_SOURCES = testsuite/testsuite.c \
-				    testsuite/testsuite.h
+testsuite_libtestsuite_la_SOURCES = \
+	testsuite/testsuite.c testsuite/testsuite.h
 
-testsuite_libtestsuite_la_DEPENDENCIES = $(ROOTFS) \
-					 $(TESTSUITE_OVERRIDE_LIBS)
+testsuite_libtestsuite_la_DEPENDENCIES = \
+	$(ROOTFS) $(TESTSUITE_OVERRIDE_LIBS)
 
 testsuite_libtestsuite_la_CPPFLAGS = $(TESTSUITE_CPPFLAGS)
 testsuite_libtestsuite_la_LIBADD = -lrt
-TESTSUITE = testsuite/test-init testsuite/test-testsuite testsuite/test-loaded \
-	    testsuite/test-modinfo testsuite/test-util testsuite/test-new-module \
-	    testsuite/test-modprobe testsuite/test-blacklist \
-	    testsuite/test-dependencies testsuite/test-depmod
+TESTSUITE = \
+	testsuite/test-hash \
+	testsuite/test-array \
+	testsuite/test-strbuf \
+	testsuite/test-init \
+	testsuite/test-initstate \
+	testsuite/test-testsuite testsuite/test-loaded \
+	testsuite/test-modinfo testsuite/test-util testsuite/test-new-module \
+	testsuite/test-modprobe testsuite/test-blacklist \
+	testsuite/test-dependencies testsuite/test-depmod \
+	testsuite/test-list \
+	testsuite/test-tools
 
-testsuite_test_testsuite_LDADD = testsuite/libtestsuite.la libkmod/libkmod-util.la
+testsuite_test_testsuite_LDADD = \
+	testsuite/libtestsuite.la shared/libshared.la
+
 testsuite_test_testsuite_CPPFLAGS = $(TESTSUITE_CPPFLAGS)
+testsuite_test_hash_LDADD = $(TESTSUITE_LDADD)
+testsuite_test_hash_CPPFLAGS = $(TESTSUITE_CPPFLAGS)
+testsuite_test_array_LDADD = $(TESTSUITE_LDADD)
+testsuite_test_array_CPPFLAGS = $(TESTSUITE_CPPFLAGS)
+testsuite_test_strbuf_LDADD = $(TESTSUITE_LDADD)
+testsuite_test_strbuf_CPPFLAGS = $(TESTSUITE_CPPFLAGS)
 testsuite_test_init_LDADD = $(TESTSUITE_LDADD)
 testsuite_test_init_CPPFLAGS = $(TESTSUITE_CPPFLAGS)
+testsuite_test_initstate_LDADD = $(TESTSUITE_LDADD)
+testsuite_test_initstate_CPPFLAGS = $(TESTSUITE_CPPFLAGS)
 testsuite_test_loaded_LDADD = $(TESTSUITE_LDADD)
 testsuite_test_loaded_CPPFLAGS = $(TESTSUITE_CPPFLAGS)
 testsuite_test_modinfo_LDADD = $(TESTSUITE_LDADD)
@@ -1021,9 +1118,17 @@ testsuite_test_dependencies_LDADD = $(TESTSUITE_LDADD)
 testsuite_test_dependencies_CPPFLAGS = $(TESTSUITE_CPPFLAGS)
 testsuite_test_depmod_LDADD = $(TESTSUITE_LDADD)
 testsuite_test_depmod_CPPFLAGS = $(TESTSUITE_CPPFLAGS)
+testsuite_test_list_LDADD = $(TESTSUITE_LDADD)
+testsuite_test_list_CPPFLAGS = $(TESTSUITE_CPPFLAGS)
+testsuite_test_tools_LDADD = $(TESTSUITE_LDADD)
+testsuite_test_tools_CPPFLAGS = $(TESTSUITE_CPPFLAGS)
 DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc --enable-python --sysconfdir=/etc \
 	--with-zlib \
 	--with-bashcompletiondir=$$dc_install_base/$(bashcompletiondir)
+
+coverage_dir = coverage
+coverage_opts = --base-directory $(srcdir) --directory $(builddir) \
+		--rc 'geninfo_adjust_src_path=$(abspath $(srcdir))=>$(abspath $(builddir))'
 
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
@@ -1196,15 +1301,6 @@ libkmod/libkmod-signature.lo: libkmod/$(am__dirstamp) \
 
 libkmod/libkmod-internal.la: $(libkmod_libkmod_internal_la_OBJECTS) $(libkmod_libkmod_internal_la_DEPENDENCIES) $(EXTRA_libkmod_libkmod_internal_la_DEPENDENCIES) libkmod/$(am__dirstamp)
 	$(AM_V_CCLD)$(libkmod_libkmod_internal_la_LINK)  $(libkmod_libkmod_internal_la_OBJECTS) $(libkmod_libkmod_internal_la_LIBADD) $(LIBS)
-libkmod/libkmod-hash.lo: libkmod/$(am__dirstamp) \
-	libkmod/$(DEPDIR)/$(am__dirstamp)
-libkmod/libkmod-array.lo: libkmod/$(am__dirstamp) \
-	libkmod/$(DEPDIR)/$(am__dirstamp)
-libkmod/libkmod-util.lo: libkmod/$(am__dirstamp) \
-	libkmod/$(DEPDIR)/$(am__dirstamp)
-
-libkmod/libkmod-util.la: $(libkmod_libkmod_util_la_OBJECTS) $(libkmod_libkmod_util_la_DEPENDENCIES) $(EXTRA_libkmod_libkmod_util_la_DEPENDENCIES) libkmod/$(am__dirstamp)
-	$(AM_V_CCLD)$(LINK)  $(libkmod_libkmod_util_la_OBJECTS) $(libkmod_libkmod_util_la_LIBADD) $(LIBS)
 
 libkmod/libkmod.la: $(libkmod_libkmod_la_OBJECTS) $(libkmod_libkmod_la_DEPENDENCIES) $(EXTRA_libkmod_libkmod_la_DEPENDENCIES) libkmod/$(am__dirstamp)
 	$(AM_V_CCLD)$(libkmod_libkmod_la_LINK) -rpath $(libdir) $(libkmod_libkmod_la_OBJECTS) $(libkmod_libkmod_la_LIBADD) $(LIBS)
@@ -1238,6 +1334,23 @@ libkmod/python/kmod/libkmod_python_kmod_module_la-module.lo:  \
 
 libkmod/python/kmod/module.la: $(libkmod_python_kmod_module_la_OBJECTS) $(libkmod_python_kmod_module_la_DEPENDENCIES) $(EXTRA_libkmod_python_kmod_module_la_DEPENDENCIES) libkmod/python/kmod/$(am__dirstamp)
 	$(AM_V_CCLD)$(libkmod_python_kmod_module_la_LINK) $(am_libkmod_python_kmod_module_la_rpath) $(libkmod_python_kmod_module_la_OBJECTS) $(libkmod_python_kmod_module_la_LIBADD) $(LIBS)
+shared/$(am__dirstamp):
+	@$(MKDIR_P) shared
+	@: > shared/$(am__dirstamp)
+shared/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) shared/$(DEPDIR)
+	@: > shared/$(DEPDIR)/$(am__dirstamp)
+shared/array.lo: shared/$(am__dirstamp) \
+	shared/$(DEPDIR)/$(am__dirstamp)
+shared/hash.lo: shared/$(am__dirstamp) \
+	shared/$(DEPDIR)/$(am__dirstamp)
+shared/strbuf.lo: shared/$(am__dirstamp) \
+	shared/$(DEPDIR)/$(am__dirstamp)
+shared/util.lo: shared/$(am__dirstamp) \
+	shared/$(DEPDIR)/$(am__dirstamp)
+
+shared/libshared.la: $(shared_libshared_la_OBJECTS) $(shared_libshared_la_DEPENDENCIES) $(EXTRA_shared_libshared_la_DEPENDENCIES) shared/$(am__dirstamp)
+	$(AM_V_CCLD)$(LINK)  $(shared_libshared_la_OBJECTS) $(shared_libshared_la_LIBADD) $(LIBS)
 testsuite/$(am__dirstamp):
 	@$(MKDIR_P) testsuite
 	@: > testsuite/$(am__dirstamp)
@@ -1259,7 +1372,7 @@ testsuite/testsuite_libtestsuite_la-testsuite.lo:  \
 
 testsuite/libtestsuite.la: $(testsuite_libtestsuite_la_OBJECTS) $(testsuite_libtestsuite_la_DEPENDENCIES) $(EXTRA_testsuite_libtestsuite_la_DEPENDENCIES) testsuite/$(am__dirstamp)
 	$(AM_V_CCLD)$(LINK)  $(testsuite_libtestsuite_la_OBJECTS) $(testsuite_libtestsuite_la_LIBADD) $(LIBS)
-testsuite/path.lo: testsuite/$(am__dirstamp) \
+testsuite/testsuite_path_la-path.lo: testsuite/$(am__dirstamp) \
 	testsuite/$(DEPDIR)/$(am__dirstamp)
 
 testsuite/path.la: $(testsuite_path_la_OBJECTS) $(testsuite_path_la_DEPENDENCIES) $(EXTRA_testsuite_path_la_DEPENDENCIES) testsuite/$(am__dirstamp)
@@ -1327,6 +1440,12 @@ clean-checkPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
+testsuite/testsuite_test_array-test-array.$(OBJEXT):  \
+	testsuite/$(am__dirstamp) testsuite/$(DEPDIR)/$(am__dirstamp)
+
+testsuite/test-array$(EXEEXT): $(testsuite_test_array_OBJECTS) $(testsuite_test_array_DEPENDENCIES) $(EXTRA_testsuite_test_array_DEPENDENCIES) testsuite/$(am__dirstamp)
+	@rm -f testsuite/test-array$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(testsuite_test_array_OBJECTS) $(testsuite_test_array_LDADD) $(LIBS)
 testsuite/testsuite_test_blacklist-test-blacklist.$(OBJEXT):  \
 	testsuite/$(am__dirstamp) testsuite/$(DEPDIR)/$(am__dirstamp)
 
@@ -1345,12 +1464,30 @@ testsuite/testsuite_test_depmod-test-depmod.$(OBJEXT):  \
 testsuite/test-depmod$(EXEEXT): $(testsuite_test_depmod_OBJECTS) $(testsuite_test_depmod_DEPENDENCIES) $(EXTRA_testsuite_test_depmod_DEPENDENCIES) testsuite/$(am__dirstamp)
 	@rm -f testsuite/test-depmod$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(testsuite_test_depmod_OBJECTS) $(testsuite_test_depmod_LDADD) $(LIBS)
+testsuite/testsuite_test_hash-test-hash.$(OBJEXT):  \
+	testsuite/$(am__dirstamp) testsuite/$(DEPDIR)/$(am__dirstamp)
+
+testsuite/test-hash$(EXEEXT): $(testsuite_test_hash_OBJECTS) $(testsuite_test_hash_DEPENDENCIES) $(EXTRA_testsuite_test_hash_DEPENDENCIES) testsuite/$(am__dirstamp)
+	@rm -f testsuite/test-hash$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(testsuite_test_hash_OBJECTS) $(testsuite_test_hash_LDADD) $(LIBS)
 testsuite/testsuite_test_init-test-init.$(OBJEXT):  \
 	testsuite/$(am__dirstamp) testsuite/$(DEPDIR)/$(am__dirstamp)
 
 testsuite/test-init$(EXEEXT): $(testsuite_test_init_OBJECTS) $(testsuite_test_init_DEPENDENCIES) $(EXTRA_testsuite_test_init_DEPENDENCIES) testsuite/$(am__dirstamp)
 	@rm -f testsuite/test-init$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(testsuite_test_init_OBJECTS) $(testsuite_test_init_LDADD) $(LIBS)
+testsuite/testsuite_test_initstate-test-initstate.$(OBJEXT):  \
+	testsuite/$(am__dirstamp) testsuite/$(DEPDIR)/$(am__dirstamp)
+
+testsuite/test-initstate$(EXEEXT): $(testsuite_test_initstate_OBJECTS) $(testsuite_test_initstate_DEPENDENCIES) $(EXTRA_testsuite_test_initstate_DEPENDENCIES) testsuite/$(am__dirstamp)
+	@rm -f testsuite/test-initstate$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(testsuite_test_initstate_OBJECTS) $(testsuite_test_initstate_LDADD) $(LIBS)
+testsuite/testsuite_test_list-test-list.$(OBJEXT):  \
+	testsuite/$(am__dirstamp) testsuite/$(DEPDIR)/$(am__dirstamp)
+
+testsuite/test-list$(EXEEXT): $(testsuite_test_list_OBJECTS) $(testsuite_test_list_DEPENDENCIES) $(EXTRA_testsuite_test_list_DEPENDENCIES) testsuite/$(am__dirstamp)
+	@rm -f testsuite/test-list$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(testsuite_test_list_OBJECTS) $(testsuite_test_list_LDADD) $(LIBS)
 testsuite/testsuite_test_loaded-test-loaded.$(OBJEXT):  \
 	testsuite/$(am__dirstamp) testsuite/$(DEPDIR)/$(am__dirstamp)
 
@@ -1375,12 +1512,24 @@ testsuite/testsuite_test_new_module-test-new-module.$(OBJEXT):  \
 testsuite/test-new-module$(EXEEXT): $(testsuite_test_new_module_OBJECTS) $(testsuite_test_new_module_DEPENDENCIES) $(EXTRA_testsuite_test_new_module_DEPENDENCIES) testsuite/$(am__dirstamp)
 	@rm -f testsuite/test-new-module$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(testsuite_test_new_module_OBJECTS) $(testsuite_test_new_module_LDADD) $(LIBS)
+testsuite/testsuite_test_strbuf-test-strbuf.$(OBJEXT):  \
+	testsuite/$(am__dirstamp) testsuite/$(DEPDIR)/$(am__dirstamp)
+
+testsuite/test-strbuf$(EXEEXT): $(testsuite_test_strbuf_OBJECTS) $(testsuite_test_strbuf_DEPENDENCIES) $(EXTRA_testsuite_test_strbuf_DEPENDENCIES) testsuite/$(am__dirstamp)
+	@rm -f testsuite/test-strbuf$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(testsuite_test_strbuf_OBJECTS) $(testsuite_test_strbuf_LDADD) $(LIBS)
 testsuite/testsuite_test_testsuite-test-testsuite.$(OBJEXT):  \
 	testsuite/$(am__dirstamp) testsuite/$(DEPDIR)/$(am__dirstamp)
 
 testsuite/test-testsuite$(EXEEXT): $(testsuite_test_testsuite_OBJECTS) $(testsuite_test_testsuite_DEPENDENCIES) $(EXTRA_testsuite_test_testsuite_DEPENDENCIES) testsuite/$(am__dirstamp)
 	@rm -f testsuite/test-testsuite$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(testsuite_test_testsuite_OBJECTS) $(testsuite_test_testsuite_LDADD) $(LIBS)
+testsuite/testsuite_test_tools-test-tools.$(OBJEXT):  \
+	testsuite/$(am__dirstamp) testsuite/$(DEPDIR)/$(am__dirstamp)
+
+testsuite/test-tools$(EXEEXT): $(testsuite_test_tools_OBJECTS) $(testsuite_test_tools_DEPENDENCIES) $(EXTRA_testsuite_test_tools_DEPENDENCIES) testsuite/$(am__dirstamp)
+	@rm -f testsuite/test-tools$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(testsuite_test_tools_OBJECTS) $(testsuite_test_tools_LDADD) $(LIBS)
 testsuite/testsuite_test_util-test-util.$(OBJEXT):  \
 	testsuite/$(am__dirstamp) testsuite/$(DEPDIR)/$(am__dirstamp)
 
@@ -1409,6 +1558,10 @@ tools/depmod.$(OBJEXT): tools/$(am__dirstamp) \
 	tools/$(DEPDIR)/$(am__dirstamp)
 tools/log.$(OBJEXT): tools/$(am__dirstamp) \
 	tools/$(DEPDIR)/$(am__dirstamp)
+tools/insert.$(OBJEXT): tools/$(am__dirstamp) \
+	tools/$(DEPDIR)/$(am__dirstamp)
+tools/remove.$(OBJEXT): tools/$(am__dirstamp) \
+	tools/$(DEPDIR)/$(am__dirstamp)
 tools/static-nodes.$(OBJEXT): tools/$(am__dirstamp) \
 	tools/$(DEPDIR)/$(am__dirstamp)
 
@@ -1422,6 +1575,8 @@ mostlyclean-compile:
 	-rm -f libkmod/*.lo
 	-rm -f libkmod/python/kmod/*.$(OBJEXT)
 	-rm -f libkmod/python/kmod/*.lo
+	-rm -f shared/*.$(OBJEXT)
+	-rm -f shared/*.lo
 	-rm -f testsuite/*.$(OBJEXT)
 	-rm -f testsuite/*.lo
 	-rm -f tools/*.$(OBJEXT)
@@ -1429,43 +1584,52 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@libkmod/$(DEPDIR)/libkmod-array.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@libkmod/$(DEPDIR)/libkmod-config.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@libkmod/$(DEPDIR)/libkmod-elf.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@libkmod/$(DEPDIR)/libkmod-file.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@libkmod/$(DEPDIR)/libkmod-hash.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@libkmod/$(DEPDIR)/libkmod-index.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@libkmod/$(DEPDIR)/libkmod-list.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@libkmod/$(DEPDIR)/libkmod-module.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@libkmod/$(DEPDIR)/libkmod-signature.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@libkmod/$(DEPDIR)/libkmod-util.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@libkmod/$(DEPDIR)/libkmod.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@libkmod/python/kmod/$(DEPDIR)/libkmod_python_kmod__util_la-_util.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@libkmod/python/kmod/$(DEPDIR)/libkmod_python_kmod_kmod_la-kmod.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@libkmod/python/kmod/$(DEPDIR)/libkmod_python_kmod_list_la-list.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@libkmod/python/kmod/$(DEPDIR)/libkmod_python_kmod_module_la-module.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@shared/$(DEPDIR)/array.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@shared/$(DEPDIR)/hash.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@shared/$(DEPDIR)/strbuf.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@shared/$(DEPDIR)/util.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@testsuite/$(DEPDIR)/delete_module.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@testsuite/$(DEPDIR)/init_module.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@testsuite/$(DEPDIR)/path.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@testsuite/$(DEPDIR)/testsuite_libtestsuite_la-testsuite.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@testsuite/$(DEPDIR)/testsuite_path_la-path.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@testsuite/$(DEPDIR)/testsuite_test_array-test-array.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@testsuite/$(DEPDIR)/testsuite_test_blacklist-test-blacklist.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@testsuite/$(DEPDIR)/testsuite_test_dependencies-test-dependencies.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@testsuite/$(DEPDIR)/testsuite_test_depmod-test-depmod.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@testsuite/$(DEPDIR)/testsuite_test_hash-test-hash.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@testsuite/$(DEPDIR)/testsuite_test_init-test-init.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@testsuite/$(DEPDIR)/testsuite_test_initstate-test-initstate.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@testsuite/$(DEPDIR)/testsuite_test_list-test-list.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@testsuite/$(DEPDIR)/testsuite_test_loaded-test-loaded.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@testsuite/$(DEPDIR)/testsuite_test_modinfo-test-modinfo.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@testsuite/$(DEPDIR)/testsuite_test_modprobe-test-modprobe.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@testsuite/$(DEPDIR)/testsuite_test_new_module-test-new-module.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@testsuite/$(DEPDIR)/testsuite_test_strbuf-test-strbuf.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@testsuite/$(DEPDIR)/testsuite_test_testsuite-test-testsuite.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@testsuite/$(DEPDIR)/testsuite_test_tools-test-tools.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@testsuite/$(DEPDIR)/testsuite_test_util-test-util.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@testsuite/$(DEPDIR)/uname.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tools/$(DEPDIR)/depmod.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tools/$(DEPDIR)/insert.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tools/$(DEPDIR)/insmod.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tools/$(DEPDIR)/kmod.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tools/$(DEPDIR)/log.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tools/$(DEPDIR)/lsmod.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tools/$(DEPDIR)/modinfo.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tools/$(DEPDIR)/modprobe.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@tools/$(DEPDIR)/remove.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tools/$(DEPDIR)/rmmod.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@tools/$(DEPDIR)/static-nodes.Po@am__quote@
 
@@ -1528,6 +1692,27 @@ testsuite/testsuite_libtestsuite_la-testsuite.lo: testsuite/testsuite.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(testsuite_libtestsuite_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o testsuite/testsuite_libtestsuite_la-testsuite.lo `test -f 'testsuite/testsuite.c' || echo '$(srcdir)/'`testsuite/testsuite.c
 
+testsuite/testsuite_path_la-path.lo: testsuite/path.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(testsuite_path_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT testsuite/testsuite_path_la-path.lo -MD -MP -MF testsuite/$(DEPDIR)/testsuite_path_la-path.Tpo -c -o testsuite/testsuite_path_la-path.lo `test -f 'testsuite/path.c' || echo '$(srcdir)/'`testsuite/path.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) testsuite/$(DEPDIR)/testsuite_path_la-path.Tpo testsuite/$(DEPDIR)/testsuite_path_la-path.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testsuite/path.c' object='testsuite/testsuite_path_la-path.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(testsuite_path_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o testsuite/testsuite_path_la-path.lo `test -f 'testsuite/path.c' || echo '$(srcdir)/'`testsuite/path.c
+
+testsuite/testsuite_test_array-test-array.o: testsuite/test-array.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(testsuite_test_array_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT testsuite/testsuite_test_array-test-array.o -MD -MP -MF testsuite/$(DEPDIR)/testsuite_test_array-test-array.Tpo -c -o testsuite/testsuite_test_array-test-array.o `test -f 'testsuite/test-array.c' || echo '$(srcdir)/'`testsuite/test-array.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) testsuite/$(DEPDIR)/testsuite_test_array-test-array.Tpo testsuite/$(DEPDIR)/testsuite_test_array-test-array.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testsuite/test-array.c' object='testsuite/testsuite_test_array-test-array.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(testsuite_test_array_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o testsuite/testsuite_test_array-test-array.o `test -f 'testsuite/test-array.c' || echo '$(srcdir)/'`testsuite/test-array.c
+
+testsuite/testsuite_test_array-test-array.obj: testsuite/test-array.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(testsuite_test_array_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT testsuite/testsuite_test_array-test-array.obj -MD -MP -MF testsuite/$(DEPDIR)/testsuite_test_array-test-array.Tpo -c -o testsuite/testsuite_test_array-test-array.obj `if test -f 'testsuite/test-array.c'; then $(CYGPATH_W) 'testsuite/test-array.c'; else $(CYGPATH_W) '$(srcdir)/testsuite/test-array.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) testsuite/$(DEPDIR)/testsuite_test_array-test-array.Tpo testsuite/$(DEPDIR)/testsuite_test_array-test-array.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testsuite/test-array.c' object='testsuite/testsuite_test_array-test-array.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(testsuite_test_array_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o testsuite/testsuite_test_array-test-array.obj `if test -f 'testsuite/test-array.c'; then $(CYGPATH_W) 'testsuite/test-array.c'; else $(CYGPATH_W) '$(srcdir)/testsuite/test-array.c'; fi`
+
 testsuite/testsuite_test_blacklist-test-blacklist.o: testsuite/test-blacklist.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(testsuite_test_blacklist_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT testsuite/testsuite_test_blacklist-test-blacklist.o -MD -MP -MF testsuite/$(DEPDIR)/testsuite_test_blacklist-test-blacklist.Tpo -c -o testsuite/testsuite_test_blacklist-test-blacklist.o `test -f 'testsuite/test-blacklist.c' || echo '$(srcdir)/'`testsuite/test-blacklist.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) testsuite/$(DEPDIR)/testsuite_test_blacklist-test-blacklist.Tpo testsuite/$(DEPDIR)/testsuite_test_blacklist-test-blacklist.Po
@@ -1570,6 +1755,20 @@ testsuite/testsuite_test_depmod-test-depmod.obj: testsuite/test-depmod.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(testsuite_test_depmod_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o testsuite/testsuite_test_depmod-test-depmod.obj `if test -f 'testsuite/test-depmod.c'; then $(CYGPATH_W) 'testsuite/test-depmod.c'; else $(CYGPATH_W) '$(srcdir)/testsuite/test-depmod.c'; fi`
 
+testsuite/testsuite_test_hash-test-hash.o: testsuite/test-hash.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(testsuite_test_hash_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT testsuite/testsuite_test_hash-test-hash.o -MD -MP -MF testsuite/$(DEPDIR)/testsuite_test_hash-test-hash.Tpo -c -o testsuite/testsuite_test_hash-test-hash.o `test -f 'testsuite/test-hash.c' || echo '$(srcdir)/'`testsuite/test-hash.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) testsuite/$(DEPDIR)/testsuite_test_hash-test-hash.Tpo testsuite/$(DEPDIR)/testsuite_test_hash-test-hash.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testsuite/test-hash.c' object='testsuite/testsuite_test_hash-test-hash.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(testsuite_test_hash_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o testsuite/testsuite_test_hash-test-hash.o `test -f 'testsuite/test-hash.c' || echo '$(srcdir)/'`testsuite/test-hash.c
+
+testsuite/testsuite_test_hash-test-hash.obj: testsuite/test-hash.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(testsuite_test_hash_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT testsuite/testsuite_test_hash-test-hash.obj -MD -MP -MF testsuite/$(DEPDIR)/testsuite_test_hash-test-hash.Tpo -c -o testsuite/testsuite_test_hash-test-hash.obj `if test -f 'testsuite/test-hash.c'; then $(CYGPATH_W) 'testsuite/test-hash.c'; else $(CYGPATH_W) '$(srcdir)/testsuite/test-hash.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) testsuite/$(DEPDIR)/testsuite_test_hash-test-hash.Tpo testsuite/$(DEPDIR)/testsuite_test_hash-test-hash.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testsuite/test-hash.c' object='testsuite/testsuite_test_hash-test-hash.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(testsuite_test_hash_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o testsuite/testsuite_test_hash-test-hash.obj `if test -f 'testsuite/test-hash.c'; then $(CYGPATH_W) 'testsuite/test-hash.c'; else $(CYGPATH_W) '$(srcdir)/testsuite/test-hash.c'; fi`
+
 testsuite/testsuite_test_init-test-init.o: testsuite/test-init.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(testsuite_test_init_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT testsuite/testsuite_test_init-test-init.o -MD -MP -MF testsuite/$(DEPDIR)/testsuite_test_init-test-init.Tpo -c -o testsuite/testsuite_test_init-test-init.o `test -f 'testsuite/test-init.c' || echo '$(srcdir)/'`testsuite/test-init.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) testsuite/$(DEPDIR)/testsuite_test_init-test-init.Tpo testsuite/$(DEPDIR)/testsuite_test_init-test-init.Po
@@ -1583,6 +1782,34 @@ testsuite/testsuite_test_init-test-init.obj: testsuite/test-init.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testsuite/test-init.c' object='testsuite/testsuite_test_init-test-init.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(testsuite_test_init_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o testsuite/testsuite_test_init-test-init.obj `if test -f 'testsuite/test-init.c'; then $(CYGPATH_W) 'testsuite/test-init.c'; else $(CYGPATH_W) '$(srcdir)/testsuite/test-init.c'; fi`
+
+testsuite/testsuite_test_initstate-test-initstate.o: testsuite/test-initstate.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(testsuite_test_initstate_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT testsuite/testsuite_test_initstate-test-initstate.o -MD -MP -MF testsuite/$(DEPDIR)/testsuite_test_initstate-test-initstate.Tpo -c -o testsuite/testsuite_test_initstate-test-initstate.o `test -f 'testsuite/test-initstate.c' || echo '$(srcdir)/'`testsuite/test-initstate.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) testsuite/$(DEPDIR)/testsuite_test_initstate-test-initstate.Tpo testsuite/$(DEPDIR)/testsuite_test_initstate-test-initstate.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testsuite/test-initstate.c' object='testsuite/testsuite_test_initstate-test-initstate.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(testsuite_test_initstate_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o testsuite/testsuite_test_initstate-test-initstate.o `test -f 'testsuite/test-initstate.c' || echo '$(srcdir)/'`testsuite/test-initstate.c
+
+testsuite/testsuite_test_initstate-test-initstate.obj: testsuite/test-initstate.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(testsuite_test_initstate_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT testsuite/testsuite_test_initstate-test-initstate.obj -MD -MP -MF testsuite/$(DEPDIR)/testsuite_test_initstate-test-initstate.Tpo -c -o testsuite/testsuite_test_initstate-test-initstate.obj `if test -f 'testsuite/test-initstate.c'; then $(CYGPATH_W) 'testsuite/test-initstate.c'; else $(CYGPATH_W) '$(srcdir)/testsuite/test-initstate.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) testsuite/$(DEPDIR)/testsuite_test_initstate-test-initstate.Tpo testsuite/$(DEPDIR)/testsuite_test_initstate-test-initstate.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testsuite/test-initstate.c' object='testsuite/testsuite_test_initstate-test-initstate.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(testsuite_test_initstate_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o testsuite/testsuite_test_initstate-test-initstate.obj `if test -f 'testsuite/test-initstate.c'; then $(CYGPATH_W) 'testsuite/test-initstate.c'; else $(CYGPATH_W) '$(srcdir)/testsuite/test-initstate.c'; fi`
+
+testsuite/testsuite_test_list-test-list.o: testsuite/test-list.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(testsuite_test_list_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT testsuite/testsuite_test_list-test-list.o -MD -MP -MF testsuite/$(DEPDIR)/testsuite_test_list-test-list.Tpo -c -o testsuite/testsuite_test_list-test-list.o `test -f 'testsuite/test-list.c' || echo '$(srcdir)/'`testsuite/test-list.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) testsuite/$(DEPDIR)/testsuite_test_list-test-list.Tpo testsuite/$(DEPDIR)/testsuite_test_list-test-list.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testsuite/test-list.c' object='testsuite/testsuite_test_list-test-list.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(testsuite_test_list_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o testsuite/testsuite_test_list-test-list.o `test -f 'testsuite/test-list.c' || echo '$(srcdir)/'`testsuite/test-list.c
+
+testsuite/testsuite_test_list-test-list.obj: testsuite/test-list.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(testsuite_test_list_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT testsuite/testsuite_test_list-test-list.obj -MD -MP -MF testsuite/$(DEPDIR)/testsuite_test_list-test-list.Tpo -c -o testsuite/testsuite_test_list-test-list.obj `if test -f 'testsuite/test-list.c'; then $(CYGPATH_W) 'testsuite/test-list.c'; else $(CYGPATH_W) '$(srcdir)/testsuite/test-list.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) testsuite/$(DEPDIR)/testsuite_test_list-test-list.Tpo testsuite/$(DEPDIR)/testsuite_test_list-test-list.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testsuite/test-list.c' object='testsuite/testsuite_test_list-test-list.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(testsuite_test_list_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o testsuite/testsuite_test_list-test-list.obj `if test -f 'testsuite/test-list.c'; then $(CYGPATH_W) 'testsuite/test-list.c'; else $(CYGPATH_W) '$(srcdir)/testsuite/test-list.c'; fi`
 
 testsuite/testsuite_test_loaded-test-loaded.o: testsuite/test-loaded.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(testsuite_test_loaded_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT testsuite/testsuite_test_loaded-test-loaded.o -MD -MP -MF testsuite/$(DEPDIR)/testsuite_test_loaded-test-loaded.Tpo -c -o testsuite/testsuite_test_loaded-test-loaded.o `test -f 'testsuite/test-loaded.c' || echo '$(srcdir)/'`testsuite/test-loaded.c
@@ -1640,6 +1867,20 @@ testsuite/testsuite_test_new_module-test-new-module.obj: testsuite/test-new-modu
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(testsuite_test_new_module_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o testsuite/testsuite_test_new_module-test-new-module.obj `if test -f 'testsuite/test-new-module.c'; then $(CYGPATH_W) 'testsuite/test-new-module.c'; else $(CYGPATH_W) '$(srcdir)/testsuite/test-new-module.c'; fi`
 
+testsuite/testsuite_test_strbuf-test-strbuf.o: testsuite/test-strbuf.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(testsuite_test_strbuf_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT testsuite/testsuite_test_strbuf-test-strbuf.o -MD -MP -MF testsuite/$(DEPDIR)/testsuite_test_strbuf-test-strbuf.Tpo -c -o testsuite/testsuite_test_strbuf-test-strbuf.o `test -f 'testsuite/test-strbuf.c' || echo '$(srcdir)/'`testsuite/test-strbuf.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) testsuite/$(DEPDIR)/testsuite_test_strbuf-test-strbuf.Tpo testsuite/$(DEPDIR)/testsuite_test_strbuf-test-strbuf.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testsuite/test-strbuf.c' object='testsuite/testsuite_test_strbuf-test-strbuf.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(testsuite_test_strbuf_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o testsuite/testsuite_test_strbuf-test-strbuf.o `test -f 'testsuite/test-strbuf.c' || echo '$(srcdir)/'`testsuite/test-strbuf.c
+
+testsuite/testsuite_test_strbuf-test-strbuf.obj: testsuite/test-strbuf.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(testsuite_test_strbuf_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT testsuite/testsuite_test_strbuf-test-strbuf.obj -MD -MP -MF testsuite/$(DEPDIR)/testsuite_test_strbuf-test-strbuf.Tpo -c -o testsuite/testsuite_test_strbuf-test-strbuf.obj `if test -f 'testsuite/test-strbuf.c'; then $(CYGPATH_W) 'testsuite/test-strbuf.c'; else $(CYGPATH_W) '$(srcdir)/testsuite/test-strbuf.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) testsuite/$(DEPDIR)/testsuite_test_strbuf-test-strbuf.Tpo testsuite/$(DEPDIR)/testsuite_test_strbuf-test-strbuf.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testsuite/test-strbuf.c' object='testsuite/testsuite_test_strbuf-test-strbuf.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(testsuite_test_strbuf_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o testsuite/testsuite_test_strbuf-test-strbuf.obj `if test -f 'testsuite/test-strbuf.c'; then $(CYGPATH_W) 'testsuite/test-strbuf.c'; else $(CYGPATH_W) '$(srcdir)/testsuite/test-strbuf.c'; fi`
+
 testsuite/testsuite_test_testsuite-test-testsuite.o: testsuite/test-testsuite.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(testsuite_test_testsuite_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT testsuite/testsuite_test_testsuite-test-testsuite.o -MD -MP -MF testsuite/$(DEPDIR)/testsuite_test_testsuite-test-testsuite.Tpo -c -o testsuite/testsuite_test_testsuite-test-testsuite.o `test -f 'testsuite/test-testsuite.c' || echo '$(srcdir)/'`testsuite/test-testsuite.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) testsuite/$(DEPDIR)/testsuite_test_testsuite-test-testsuite.Tpo testsuite/$(DEPDIR)/testsuite_test_testsuite-test-testsuite.Po
@@ -1653,6 +1894,20 @@ testsuite/testsuite_test_testsuite-test-testsuite.obj: testsuite/test-testsuite.
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testsuite/test-testsuite.c' object='testsuite/testsuite_test_testsuite-test-testsuite.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(testsuite_test_testsuite_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o testsuite/testsuite_test_testsuite-test-testsuite.obj `if test -f 'testsuite/test-testsuite.c'; then $(CYGPATH_W) 'testsuite/test-testsuite.c'; else $(CYGPATH_W) '$(srcdir)/testsuite/test-testsuite.c'; fi`
+
+testsuite/testsuite_test_tools-test-tools.o: testsuite/test-tools.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(testsuite_test_tools_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT testsuite/testsuite_test_tools-test-tools.o -MD -MP -MF testsuite/$(DEPDIR)/testsuite_test_tools-test-tools.Tpo -c -o testsuite/testsuite_test_tools-test-tools.o `test -f 'testsuite/test-tools.c' || echo '$(srcdir)/'`testsuite/test-tools.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) testsuite/$(DEPDIR)/testsuite_test_tools-test-tools.Tpo testsuite/$(DEPDIR)/testsuite_test_tools-test-tools.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testsuite/test-tools.c' object='testsuite/testsuite_test_tools-test-tools.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(testsuite_test_tools_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o testsuite/testsuite_test_tools-test-tools.o `test -f 'testsuite/test-tools.c' || echo '$(srcdir)/'`testsuite/test-tools.c
+
+testsuite/testsuite_test_tools-test-tools.obj: testsuite/test-tools.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(testsuite_test_tools_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT testsuite/testsuite_test_tools-test-tools.obj -MD -MP -MF testsuite/$(DEPDIR)/testsuite_test_tools-test-tools.Tpo -c -o testsuite/testsuite_test_tools-test-tools.obj `if test -f 'testsuite/test-tools.c'; then $(CYGPATH_W) 'testsuite/test-tools.c'; else $(CYGPATH_W) '$(srcdir)/testsuite/test-tools.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) testsuite/$(DEPDIR)/testsuite_test_tools-test-tools.Tpo testsuite/$(DEPDIR)/testsuite_test_tools-test-tools.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='testsuite/test-tools.c' object='testsuite/testsuite_test_tools-test-tools.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(testsuite_test_tools_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o testsuite/testsuite_test_tools-test-tools.obj `if test -f 'testsuite/test-tools.c'; then $(CYGPATH_W) 'testsuite/test-tools.c'; else $(CYGPATH_W) '$(srcdir)/testsuite/test-tools.c'; fi`
 
 testsuite/testsuite_test_util-test-util.o: testsuite/test-util.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(testsuite_test_util_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT testsuite/testsuite_test_util-test-util.o -MD -MP -MF testsuite/$(DEPDIR)/testsuite_test_util-test-util.Tpo -c -o testsuite/testsuite_test_util-test-util.o `test -f 'testsuite/test-util.c' || echo '$(srcdir)/'`testsuite/test-util.c
@@ -1675,6 +1930,7 @@ clean-libtool:
 	-rm -rf .libs _libs
 	-rm -rf libkmod/.libs libkmod/_libs
 	-rm -rf libkmod/python/kmod/.libs libkmod/python/kmod/_libs
+	-rm -rf shared/.libs shared/_libs
 	-rm -rf testsuite/.libs testsuite/_libs
 	-rm -rf tools/.libs tools/_libs
 
@@ -2039,9 +2295,37 @@ recheck: all $(check_LTLIBRARIES) $(check_PROGRAMS)
 	        am__force_recheck=am--force-recheck \
 	        TEST_LOGS="$$log_list"; \
 	exit $$?
+testsuite/test-hash.log: testsuite/test-hash$(EXEEXT)
+	@p='testsuite/test-hash$(EXEEXT)'; \
+	b='testsuite/test-hash'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+testsuite/test-array.log: testsuite/test-array$(EXEEXT)
+	@p='testsuite/test-array$(EXEEXT)'; \
+	b='testsuite/test-array'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+testsuite/test-strbuf.log: testsuite/test-strbuf$(EXEEXT)
+	@p='testsuite/test-strbuf$(EXEEXT)'; \
+	b='testsuite/test-strbuf'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
 testsuite/test-init.log: testsuite/test-init$(EXEEXT)
 	@p='testsuite/test-init$(EXEEXT)'; \
 	b='testsuite/test-init'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+testsuite/test-initstate.log: testsuite/test-initstate$(EXEEXT)
+	@p='testsuite/test-initstate$(EXEEXT)'; \
+	b='testsuite/test-initstate'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
@@ -2105,6 +2389,20 @@ testsuite/test-dependencies.log: testsuite/test-dependencies$(EXEEXT)
 testsuite/test-depmod.log: testsuite/test-depmod$(EXEEXT)
 	@p='testsuite/test-depmod$(EXEEXT)'; \
 	b='testsuite/test-depmod'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+testsuite/test-list.log: testsuite/test-list$(EXEEXT)
+	@p='testsuite/test-list$(EXEEXT)'; \
+	b='testsuite/test-list'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+testsuite/test-tools.log: testsuite/test-tools$(EXEEXT)
+	@p='testsuite/test-tools$(EXEEXT)'; \
+	b='testsuite/test-tools'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
@@ -2364,10 +2662,13 @@ distclean-generic:
 	-rm -f libkmod/$(am__dirstamp)
 	-rm -f libkmod/python/kmod/$(DEPDIR)/$(am__dirstamp)
 	-rm -f libkmod/python/kmod/$(am__dirstamp)
+	-rm -f shared/$(DEPDIR)/$(am__dirstamp)
+	-rm -f shared/$(am__dirstamp)
 	-rm -f testsuite/$(DEPDIR)/$(am__dirstamp)
 	-rm -f testsuite/$(am__dirstamp)
 	-rm -f tools/$(DEPDIR)/$(am__dirstamp)
 	-rm -f tools/$(am__dirstamp)
+	-test -z "$(DISTCLEANFILES)" || rm -f $(DISTCLEANFILES)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
@@ -2381,7 +2682,7 @@ clean-am: clean-binPROGRAMS clean-checkLTLIBRARIES clean-checkPROGRAMS \
 
 distclean: distclean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
-	-rm -rf libkmod/$(DEPDIR) libkmod/python/kmod/$(DEPDIR) testsuite/$(DEPDIR) tools/$(DEPDIR)
+	-rm -rf libkmod/$(DEPDIR) libkmod/python/kmod/$(DEPDIR) shared/$(DEPDIR) testsuite/$(DEPDIR) tools/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-hdr distclean-libtool distclean-local distclean-tags
@@ -2432,7 +2733,7 @@ installcheck-am:
 maintainer-clean: maintainer-clean-recursive
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -rf $(top_srcdir)/autom4te.cache
-	-rm -rf libkmod/$(DEPDIR) libkmod/python/kmod/$(DEPDIR) testsuite/$(DEPDIR) tools/$(DEPDIR)
+	-rm -rf libkmod/$(DEPDIR) libkmod/python/kmod/$(DEPDIR) shared/$(DEPDIR) testsuite/$(DEPDIR) tools/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
@@ -2487,6 +2788,9 @@ uninstall-am: uninstall-binPROGRAMS uninstall-dist_bashcompletionDATA \
 	uninstall-pkgconfigDATA uninstall-pkgpyexecLTLIBRARIES
 
 
+GCC_COLORS ?= 'yes'
+export GCC_COLORS
+
 %.pc: %.pc.in Makefile
 	$(SED_PROCESS)
 
@@ -2512,9 +2816,18 @@ uninstall-hook:
 %.py: %.py.in Makefile
 	$(SED_PROCESS)
 
-rootfs:
+build-module-playground:
+	$(AM_V_GEN)if test "$(top_srcdir)" != "$(top_builddir)"; then \
+		$(RM) -rf testsuite/module-playground && \
+		cp -r $(top_srcdir)/$(MODULE_PLAYGROUND) $(top_builddir)/$(MODULE_PLAYGROUND) && \
+		find $(top_builddir)/$(MODULE_PLAYGROUND) -type d -exec chmod +w {} \; ; \
+		fi
+	$(MAKE) -C $(MODULE_PLAYGROUND)
+
+rootfs: build-module-playground
 	$(CREATE_ROOTFS)
-.PHONY: rootfs
+
+.PHONY: rootfs build-playground
 
 $(ROOTFS): $(ROOTFS_PRISTINE)
 	$(CREATE_ROOTFS)
@@ -2530,11 +2843,70 @@ check-am: rootfs check-sysconfdir
 testsuite-distclean:
 	$(RM) -r $(ROOTFS)
 	$(RM) testsuite/stamp-rootfs
+	$(MAKE) -C testsuite/module-playground/ clean
+	if test "$(top_srcdir)" != "$(top_builddir)"; then \
+		$(RM) -rf testsuite/module-playground; \
+	fi
 
 distclean-local: $(DISTCLEAN_LOCAL_HOOKS)
 
 buildtest-TESTS:
 	$(MAKE) $(AM_MAKEFLAGS) $(check_LTLIBRARIES) $(check_PROGRAMS)
+
+# ------------------------------------------------------------------------------
+# coverage
+# ------------------------------------------------------------------------------
+
+# .PHONY so it always rebuilds it
+.PHONY: coverage lcov-run lcov-report coverage-sync
+
+# run lcov from scratch, always
+coverage: all
+	$(MAKE) lcov-run
+	$(MAKE) lcov-report
+
+# reset run coverage tests
+@ENABLE_COVERAGE_TRUE@lcov-run:
+@ENABLE_COVERAGE_TRUE@	@rm -rf $(coverage_dir)
+@ENABLE_COVERAGE_TRUE@	lcov $(coverage_opts) --zerocounters
+@ENABLE_COVERAGE_TRUE@	-$(MAKE) check
+
+# generate report based on current coverage data
+@ENABLE_COVERAGE_TRUE@lcov-report:
+@ENABLE_COVERAGE_TRUE@	$(MKDIR_P) $(coverage_dir)
+@ENABLE_COVERAGE_TRUE@	lcov $(coverage_opts) --capture --no-external --ignore-errors graph \
+@ENABLE_COVERAGE_TRUE@		| sed 's|$(abspath $(builddir))|$(abspath $(srcdir))|' > $(coverage_dir)/.lcov.info
+@ENABLE_COVERAGE_TRUE@	lcov --remove $(coverage_dir)/.lcov.info --output-file $(coverage_dir)/.lcov-clean.info 'test-*'
+@ENABLE_COVERAGE_TRUE@	genhtml -t "kmod test coverage" -o $(coverage_dir) $(coverage_dir)/.lcov-clean.info
+@ENABLE_COVERAGE_TRUE@	@echo "Coverage report generated in $(abs_builddir)/$(coverage_dir)/index.html"
+
+@ENABLE_COVERAGE_FALSE@lcov-run lcov-report:
+@ENABLE_COVERAGE_FALSE@	echo "Need to reconfigure with --enable-coverage"
+
+# ------------------------------------------------------------------------------
+# coverity
+# ------------------------------------------------------------------------------
+
+kmod-coverity-%.tar.xz:
+	rm -rf $< cov-int
+	./bootstrap-configure --disable-python --disable-manpages
+	make clean
+	cov-build --dir cov-int make -j 4
+	tar caf $@ cov-int
+
+coverity-tar: kmod-coverity-$(shell git describe).tar.xz
+
+coverity-sync: kmod-coverity-$(shell git describe).tar.xz
+	@echo "uploading coverity tarball"
+	@curl --form token=$(COVERITY_KMOD_TOKEN) \
+		--form email=lucas.de.marchi@gmail.com \
+		--form file=@$< \
+		--form version="$(shell git describe)" \
+		--form description="" \
+		https://scan.coverity.com/builds?project=kmod
+
+coverity-clean:
+	rm -rf kmod-coverity-*.tar.xz cov-int
 
 # ------------------------------------------------------------------------------
 # custom release helpers

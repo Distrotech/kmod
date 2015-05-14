@@ -89,10 +89,10 @@ DIST_COMMON = $(top_srcdir)/libkmod/docs/gtk-doc.make \
 subdir = libkmod/docs
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/attributes.m4 \
-	$(top_srcdir)/m4/gtk-doc.m4 $(top_srcdir)/m4/libtool.m4 \
-	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
-	$(top_srcdir)/m4/ltversion.m4 $(top_srcdir)/m4/lt~obsolete.m4 \
-	$(top_srcdir)/configure.ac
+	$(top_srcdir)/m4/dolt.m4 $(top_srcdir)/m4/gtk-doc.m4 \
+	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/ltoptions.m4 \
+	$(top_srcdir)/m4/ltsugar.m4 $(top_srcdir)/m4/ltversion.m4 \
+	$(top_srcdir)/m4/lt~obsolete.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
@@ -138,6 +138,8 @@ CYTHON = @CYTHON@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
 DLLTOOL = @DLLTOOL@
+DOLT_BASH = @DOLT_BASH@
+DOLT_CLEANFILES = @DOLT_CLEANFILES@
 DSYMUTIL = @DSYMUTIL@
 DUMPBIN = @DUMPBIN@
 ECHO_C = @ECHO_C@
@@ -146,7 +148,6 @@ ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
-GCLDFLAGS = @GCLDFLAGS@
 GREP = @GREP@
 GTKDOC_CHECK = @GTKDOC_CHECK@
 GTKDOC_DEPS_CFLAGS = @GTKDOC_DEPS_CFLAGS@
@@ -166,6 +167,8 @@ LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
 LIPO = @LIPO@
 LN_S = @LN_S@
+LTCOMPILE = @LTCOMPILE@
+LTCXXCOMPILE = @LTCXXCOMPILE@
 LTLIBOBJS = @LTLIBOBJS@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
@@ -177,6 +180,8 @@ OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
 OTOOL = @OTOOL@
 OTOOL64 = @OTOOL64@
+OUR_CFLAGS = @OUR_CFLAGS@
+OUR_LDFLAGS = @OUR_LDFLAGS@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
@@ -201,7 +206,6 @@ SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
 VERSION = @VERSION@
-WARNINGFLAGS = @WARNINGFLAGS@
 XSLTPROC = @XSLTPROC@
 abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
@@ -228,6 +232,7 @@ datarootdir = @datarootdir@
 docdir = @docdir@
 dvidir = @dvidir@
 exec_prefix = @exec_prefix@
+have_coverage = @have_coverage@
 host = @host@
 host_alias = @host_alias@
 host_cpu = @host_cpu@
@@ -276,11 +281,7 @@ MKTMPL_OPTIONS = --output-dir=.
 MKHTML_OPTIONS = --path=$(abs_srcdir)/doc --path=$(abs_builddir)/doc
 HFILE_GLOB = $(top_srcdir)/libkmod/libkmod.h
 CFILE_GLOB = $(top_srcdir)/libkmod/libkmod.c $(top_srcdir)/libkmod/libkmod-module.c $(top_srcdir)/libkmod/libkmod-list.c
-IGNORE_HFILES = macro.h \
-		libkmod-internal.h \
-		libkmod-util.h \
-		libkmod-array.h \
-		libkmod-hash.h \
+IGNORE_HFILES = libkmod-internal.h \
 		libkmod-index.h
 
 content_files = version.xml
@@ -449,10 +450,10 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
-@ENABLE_GTK_DOC_FALSE@maintainer-clean-local:
+@ENABLE_GTK_DOC_FALSE@install-data-local:
 @ENABLE_GTK_DOC_FALSE@distclean-local:
 @ENABLE_GTK_DOC_FALSE@uninstall-local:
-@ENABLE_GTK_DOC_FALSE@install-data-local:
+@ENABLE_GTK_DOC_FALSE@maintainer-clean-local:
 @ENABLE_GTK_DOC_FALSE@clean-local:
 clean: clean-am
 
